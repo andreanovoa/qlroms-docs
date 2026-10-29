@@ -1,0 +1,3991 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Quantized-local reduced-order models (charts, atlas, intrusive qlGalerkin)">
+      
+      
+      
+        <link rel="canonical" href="https://andreanovoa.github.io/qlroms-docs/api/intrusive/">
+      
+      
+        <link rel="prev" href="../core/operators/">
+      
+      
+        <link rel="next" href="../ks1d/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>qlGalerkin - qlroms</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#qlromsintrusive_qlroms-qlgalerkin-and-the-data-pipelines" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="qlroms" class="md-header__button md-logo" aria-label="qlroms" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            qlroms
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              qlGalerkin
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/andreanovoa/qlroms" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    andreanovoa/qlroms
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="qlroms" class="md-nav__button md-logo" aria-label="qlroms" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    qlroms
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/andreanovoa/qlroms" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    andreanovoa/qlroms
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../config-builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config-driven builds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Live demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo/ks2d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Travelling wave (KS 2-D)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo/ks1d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chaotic attractor (KS 1-D)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1_2" id="__nav_6_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    geometry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    geometry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/charts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    charts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/atlas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    atlas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/transitions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    transitions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/metric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1_3" id="__nav_6_1_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dynamics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    dynamics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms.intrusive_qlroms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms.intrusive_qlroms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlGalerkin
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlGalerkin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        At a glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        galerkin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="galerkin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.GalerkinROM" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GalerkinROM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.qlGalerkin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qlGalerkin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qlGalerkin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.qlGalerkin.from_operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_ks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build_ks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.state_dim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        state_dim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.build_fom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_fom
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.get_full_trajectory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_full_trajectory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.load_case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_case
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_pinball
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build_pinball">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_mass_matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_mass_matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_snapshots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.snapshot_time_index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        snapshot_time_index
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.merge_restart_snapshot_metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_restart_snapshot_metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.build_sensor_indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_sensor_indices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.campaign_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        campaign_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.config_campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config_campaign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.parse_campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse_campaign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_intrusive_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_intrusive_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ks1d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ks1d
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ks2d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ks2d
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pinball/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pinball
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms.utils
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms.utils
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/diagnosis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    diagnosis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/diagnosis_plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    diagnosis_plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/paths/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    paths
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        At a glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        galerkin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="galerkin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.GalerkinROM" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GalerkinROM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.qlGalerkin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qlGalerkin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qlGalerkin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.galerkin.qlGalerkin.from_operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_ks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build_ks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.state_dim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        state_dim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.build_fom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_fom
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.get_full_trajectory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_full_trajectory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_ks.load_case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_case
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_pinball
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="build_pinball">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_mass_matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_mass_matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_snapshots
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.snapshot_time_index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        snapshot_time_index
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.merge_restart_snapshot_metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_restart_snapshot_metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.build_sensor_indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_sensor_indices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.campaign_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        campaign_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.config_campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config_campaign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.parse_campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse_campaign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qlroms.intrusive_qlroms.build_pinball.load_intrusive_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load_intrusive_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="qlromsintrusive_qlroms-qlgalerkin-and-the-data-pipelines"><code>qlroms.intrusive_qlroms</code> — qlGalerkin and the data pipelines</h1>
+<p>The intrusive family: <code>qlGalerkin</code> is the compilation of Galerkin-projected members, and
+the three cases define the members it compiles. Every case package has the same shape —
+<code>config.py</code> (<code>TEST_CASES</code> + the torch-side grids/operators), <code>fom.py</code> (the full-order
+model, a <a href="https://github.com/andreanovoa/dynamodels"><code>dynamodels</code></a> <code>Model</code>), <code>rom.py</code> (the single-cluster ROM class and
+<code>build_local_model</code>, which caches itself). The offline data pipelines sit next to them:
+<code>build_ks</code> (KS FOM + cached trajectory) and <code>build_pinball</code> (snapshot loading).</p>
+<p>The cases have their own pages: <a href="../ks1d/">KS 1-D</a> · <a href="../ks2d/">KS 2-D</a> · <a href="../pinball/">fluidic pinball</a>.</p>
+<h2 id="at-a-glance">At a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>One-liner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>galerkin.qlGalerkin</code></td>
+<td>Compilation of intrusively-projected members, one <code>GalerkinROM</code> per chart (<code>isinstance</code> tells the family apart); <code>from_operators</code> reloads stacked (b, A, B).</td>
+</tr>
+<tr>
+<td><code>build_ks</code></td>
+<td>KS offline data pipeline: <code>build_fom</code> (a case's FOM + merged run config), <code>get_full_trajectory</code> (the physical trajectory, generated in chunks and cached), <code>build_sensor_indices</code> (sensor placement on the KS grid).</td>
+</tr>
+<tr>
+<td><code>build_pinball</code></td>
+<td><code>load_snapshots</code>: stack <code>velocity_*.npy</code> / <code>pressure_*.npy</code> into an <code>(Ndof, Nt)</code> matrix plus the snapshot spacing.</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="qlroms.intrusive_qlroms.galerkin" class="doc doc-heading">
+            <code>qlroms.intrusive_qlroms.galerkin</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>qlGalerkin: the intrusive model family.</p>
+<p>A qlGalerkin is simply the compilation (qlroms.base.qlROM) of single-cluster
+ROMs whose operators come from an intrusive Galerkin projection of a known
+governing-equation operator -- the case ROM classes (ks1d.rom.ROM,
+ks2d.rom.ROM, pinball.rom.ROM) own those operators and <code>step_reduced</code>;
+compiling K of them yields the quantized-local model. The name records the family,
+so <code>isinstance(model, qlGalerkin)</code> identifies intrusive compilations in
+family-agnostic code.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="qlroms.intrusive_qlroms.galerkin.GalerkinROM" class="doc doc-heading">
+            <code>GalerkinROM</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="QuadROM (qlroms.charts.QuadROM)" href="../core/charts/#qlroms.charts.QuadROM">QuadROM</a></code></p>
+
+
+
+        <p>One cluster's intrusive quadratic ROM: the family-neutral QuadROM member
+(qlroms.charts.QuadROM -- geometry + (b, A, B) + ETDRK4 step), labeled as INTRUSIVE:
+its operators come from a Galerkin projection of a known governing-equation
+operator, never from a regression.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>qlroms/intrusive_qlroms/galerkin.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GalerkinROM</span><span class="p">(</span><span class="n">QuadROM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One cluster's intrusive quadratic ROM: the family-neutral QuadROM member</span>
+<span class="sd">    (qlroms.charts.QuadROM -- geometry + (b, A, B) + ETDRK4 step), labeled as INTRUSIVE:</span>
+<span class="sd">    its operators come from a Galerkin projection of a known governing-equation</span>
+<span class="sd">    operator, never from a regression."""</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="qlroms.intrusive_qlroms.galerkin.qlGalerkin" class="doc doc-heading">
+            <code>qlGalerkin</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="qlROM (qlroms.base.qlROM)" href="../core/base/#qlroms.base.qlROM">qlROM</a></code></p>
+
+
+
+        <p>Compilation of intrusively-projected (Galerkin) single-cluster ROMs.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>qlroms/intrusive_qlroms/galerkin.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">qlGalerkin</span><span class="p">(</span><span class="n">qlROM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compilation of intrusively-projected (Galerkin) single-cluster ROMs."""</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_operators</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">Phi_all</span><span class="p">,</span> <span class="n">b_all</span><span class="p">,</span> <span class="n">A_all</span><span class="p">,</span> <span class="n">B_all</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                       <span class="n">Mw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Mcontour</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">Rcontour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">15.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"qlGalerkin"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Build a qlGalerkin from already-projected reduced operators, skipping any</span>
+<span class="sd">        fit -- e.g. to reload stacked (b, A, B) from disk (tests/test_qlgalerkin_bridge.py);</span>
+<span class="sd">        the case builders compile their own ROM classes directly.</span>
+
+<span class="sd">        The reduced continuous quadratic ODE  da/dt = b + A a + B(a, a)  is the</span>
+<span class="sd">        family-neutral qlroms.charts.QuadROM compute; GalerkinROM records the</span>
+<span class="sd">        intrusive provenance.</span>
+<span class="sd">        centroids (K, N), Phi_all (N, r, K), b/A/B stacked (K, ...); Mw is the chart</span>
+<span class="sd">        inner-product weight (e.g. the FEM mass matrix; None for M = I).</span>
+<span class="sd">        """</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">roms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+            <span class="n">rom</span> <span class="o">=</span> <span class="n">GalerkinROM</span><span class="p">(</span><span class="n">Phi_all</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">centroids</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">Mw</span><span class="o">=</span><span class="n">Mw</span><span class="p">,</span>
+                              <span class="n">Mcontour</span><span class="o">=</span><span class="n">Mcontour</span><span class="p">,</span> <span class="n">Rcontour</span><span class="o">=</span><span class="n">Rcontour</span><span class="p">)</span>
+            <span class="n">rom</span><span class="o">.</span><span class="n">set_operators</span><span class="p">(</span><span class="n">b_all</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">A_all</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">B_all</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">roms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rom</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">roms</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">b_all</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">A_all</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">B_all</span> <span class="o">=</span> <span class="n">b_all</span><span class="p">,</span> <span class="n">A_all</span><span class="p">,</span> <span class="n">B_all</span>
+        <span class="k">return</span> <span class="n">model</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_post_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Predict/correct: project each column of a (r, m) onto its chart's reduced-divergence</span>
+<span class="sd">        constraint D_k a + d_k = 0 (pinball PODGalerkinODEOperators.correct_divergence), after</span>
+<span class="sd">        the ETDRK4 step and the transition. Only pinball models carry .pressure_ops; a no-op</span>
+<span class="sd">        for every other qlGalerkin and on charts with r_pressure == 0."""</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"pressure_ops"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="n">Pq</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span><span class="o">.</span><span class="n">_divergence_projection</span>
+            <span class="k">if</span> <span class="n">Pq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">P</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">Pq</span><span class="p">)</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">ids</span> <span class="o">==</span> <span class="n">k</span>
+                <span class="n">a</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span> <span class="o">@</span> <span class="n">a</span><span class="p">[:,</span> <span class="n">m</span><span class="p">]</span> <span class="o">+</span> <span class="n">q</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">a</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qlroms.intrusive_qlroms.galerkin.qlGalerkin.from_operators" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">from_operators</span><span class="p">(</span><span class="n">centroids</span><span class="p">,</span> <span class="n">Phi_all</span><span class="p">,</span> <span class="n">b_all</span><span class="p">,</span> <span class="n">A_all</span><span class="p">,</span> <span class="n">B_all</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Mw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Mcontour</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">Rcontour</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Build a qlGalerkin from already-projected reduced operators, skipping any
+fit -- e.g. to reload stacked (b, A, B) from disk (tests/test_qlgalerkin_bridge.py);
+the case builders compile their own ROM classes directly.</p>
+<p>The reduced continuous quadratic ODE  da/dt = b + A a + B(a, a)  is the
+family-neutral qlroms.charts.QuadROM compute; GalerkinROM records the
+intrusive provenance.
+centroids (K, N), Phi_all (N, r, K), b/A/B stacked (K, ...); Mw is the chart
+inner-product weight (e.g. the FEM mass matrix; None for M = I).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/galerkin.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_operators</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">centroids</span><span class="p">,</span> <span class="n">Phi_all</span><span class="p">,</span> <span class="n">b_all</span><span class="p">,</span> <span class="n">A_all</span><span class="p">,</span> <span class="n">B_all</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="n">Mw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Mcontour</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">Rcontour</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">15.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"qlGalerkin"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Build a qlGalerkin from already-projected reduced operators, skipping any</span>
+<span class="sd">    fit -- e.g. to reload stacked (b, A, B) from disk (tests/test_qlgalerkin_bridge.py);</span>
+<span class="sd">    the case builders compile their own ROM classes directly.</span>
+
+<span class="sd">    The reduced continuous quadratic ODE  da/dt = b + A a + B(a, a)  is the</span>
+<span class="sd">    family-neutral qlroms.charts.QuadROM compute; GalerkinROM records the</span>
+<span class="sd">    intrusive provenance.</span>
+<span class="sd">    centroids (K, N), Phi_all (N, r, K), b/A/B stacked (K, ...); Mw is the chart</span>
+<span class="sd">    inner-product weight (e.g. the FEM mass matrix; None for M = I).</span>
+<span class="sd">    """</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">roms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="n">rom</span> <span class="o">=</span> <span class="n">GalerkinROM</span><span class="p">(</span><span class="n">Phi_all</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">centroids</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">Mw</span><span class="o">=</span><span class="n">Mw</span><span class="p">,</span>
+                          <span class="n">Mcontour</span><span class="o">=</span><span class="n">Mcontour</span><span class="p">,</span> <span class="n">Rcontour</span><span class="o">=</span><span class="n">Rcontour</span><span class="p">)</span>
+        <span class="n">rom</span><span class="o">.</span><span class="n">set_operators</span><span class="p">(</span><span class="n">b_all</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">A_all</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">B_all</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">roms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rom</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">roms</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">b_all</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">A_all</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">B_all</span> <span class="o">=</span> <span class="n">b_all</span><span class="p">,</span> <span class="n">A_all</span><span class="p">,</span> <span class="n">B_all</span>
+    <span class="k">return</span> <span class="n">model</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="qlroms.intrusive_qlroms.build_ks" class="doc doc-heading">
+            <code>qlroms.intrusive_qlroms.build_ks</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Offline KS build pipeline (ks1d / ks2d): the case FOM (build_fom) and its
+cached full physical trajectory (get_full_trajectory), which feed the case
+rom.build_local_model -- see qlroms.utils.builder.build_case for the
+config-driven orchestration. Also the sensor-placement helper
+build_sensor_indices.</p>
+<p>The full-order models are the cases' own FOM classes (module.FOM: a
+dynamodels.physical.KS / KS2D subclass); the ROM machinery stays torch.
+build_fom constructs module.FOM for a case, get_full_trajectory drives
+model.time_integrate and caches the physical snapshot matrix in the exact same
+file format/layout as the old torch FOMs, so existing full_trajectory.pth
+caches keep hitting.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_ks.state_dim" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">state_dim</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Flattened PHYSICAL state length of a KS FOM or config (1D: Nx, 2D: Nx*Ny).</p>
+<p>Do not use model.N for dynamodels models: dynamodels.Model.N is the
+analysis-augmented size (Nphi + Na + Nq), not the physical grid size.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_ks.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">state_dim</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Flattened PHYSICAL state length of a KS FOM or config (1D: Nx, 2D: Nx*Ny).</span>
+
+<span class="sd">    Do not use model.N for dynamodels models: dynamodels.Model.N is the</span>
+<span class="sd">    analysis-augmented size (Nphi + Na + Nq), not the physical grid size.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"Ny"</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Nx</span><span class="p">)</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Ny</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">Nx</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_ks.build_fom" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">build_fom</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Build the case's full-order model and return (fom, cfg).</p>
+<p>The FOM is module.FOM(case=...) -- a dynamodels Model subclass
+(ks1d.FOM(physical.KS) / ks2d.FOM(physical.KS2D)) that reads the case's
+PHYSICAL parameters straight out of its own torch-side config, which it
+keeps as <code>fom.cfg</code>. There is no rescaling and nothing is attached after
+construction: <code>fom.dt</code> IS the case's physical time step, and the case-side
+quantities the ROM stack reads (visc/Lx/lamb1/device/rdtype/cdtype, 2-D
+<code>wt</code>) are properties on the class delegating to <code>fom.cfg</code>.</p>
+<p>Per-case model params (Nx/Ny/dt/visc/nu/lamb1) live in module.TEST_CASES[case].
+Dataset params (Ntrain/Ntest/i0) come from TEST_CASES[case] (1D) or
+module.TIME_DEFAULTS (2D). <code>overrides</code> (CLI flags; None values ignored)
+win over both and, because the torch ROM configs read their params from
+TEST_CASES, are written there before construction.</p>
+<p>cfg is the merged dict the scripts run on:
+    TIME_DEFAULTS &lt; TEST_CASES[case] &lt; overrides, plus case/module.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_ks.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_fom</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the case's full-order model and return (fom, cfg).</span>
+
+<span class="sd">    The FOM is module.FOM(case=...) -- a dynamodels Model subclass</span>
+<span class="sd">    (ks1d.FOM(physical.KS) / ks2d.FOM(physical.KS2D)) that reads the case's</span>
+<span class="sd">    PHYSICAL parameters straight out of its own torch-side config, which it</span>
+<span class="sd">    keeps as `fom.cfg`. There is no rescaling and nothing is attached after</span>
+<span class="sd">    construction: `fom.dt` IS the case's physical time step, and the case-side</span>
+<span class="sd">    quantities the ROM stack reads (visc/Lx/lamb1/device/rdtype/cdtype, 2-D</span>
+<span class="sd">    `wt`) are properties on the class delegating to `fom.cfg`.</span>
+
+<span class="sd">    Per-case model params (Nx/Ny/dt/visc/nu/lamb1) live in module.TEST_CASES[case].</span>
+<span class="sd">    Dataset params (Ntrain/Ntest/i0) come from TEST_CASES[case] (1D) or</span>
+<span class="sd">    module.TIME_DEFAULTS (2D). `overrides` (CLI flags; None values ignored)</span>
+<span class="sd">    win over both and, because the torch ROM configs read their params from</span>
+<span class="sd">    TEST_CASES, are written there before construction.</span>
+
+<span class="sd">    cfg is the merged dict the scripts run on:</span>
+<span class="sd">        TIME_DEFAULTS &lt; TEST_CASES[case] &lt; overrides, plus case/module.</span>
+<span class="sd">    """</span>
+    <span class="n">TEST_CASES</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">TEST_CASES</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="n">case</span> <span class="ow">or</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">TEST_CASES</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">case</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TEST_CASES</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown case '</span><span class="si">{</span><span class="n">case</span><span class="si">}</span><span class="s2">'. Valid: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">TEST_CASES</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+
+    <span class="n">ov</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">overrides</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="k">if</span> <span class="s2">"Nx"</span> <span class="ow">in</span> <span class="n">ov</span> <span class="ow">and</span> <span class="s2">"Ny"</span> <span class="ow">in</span> <span class="n">TEST_CASES</span><span class="p">[</span><span class="n">case</span><span class="p">]:</span>     <span class="c1"># 2D: keep Ny in sync unless given</span>
+        <span class="n">ov</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"Ny"</span><span class="p">,</span> <span class="n">ov</span><span class="p">[</span><span class="s2">"Nx"</span><span class="p">])</span>
+
+    <span class="n">TEST_CASES</span><span class="p">[</span><span class="n">case</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ov</span><span class="p">)</span>  <span class="c1"># ponytail: mutate module global; one FOM per process run, no leak</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">"TIME_DEFAULTS"</span><span class="p">,</span> <span class="p">{}),</span> <span class="o">**</span><span class="n">TEST_CASES</span><span class="p">[</span><span class="n">case</span><span class="p">],</span>
+           <span class="s2">"case"</span><span class="p">:</span> <span class="n">case</span><span class="p">,</span> <span class="s2">"module"</span><span class="p">:</span> <span class="n">module</span><span class="p">}</span>
+    <span class="n">fom</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">FOM</span><span class="p">(</span><span class="n">case</span><span class="o">=</span><span class="n">case</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fom</span><span class="p">,</span> <span class="n">cfg</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_ks.get_full_trajectory" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_full_trajectory</span><span class="p">(</span><span class="n">Ntot</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">i0</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute or load the full physical trajectory of a KS FOM.</p>
+<p>Works for both 1D and 2D KS: <code>model</code> is the CONSTRUCTED dynamodels model
+returned by build_fom (physical.KS or physical.KS2D). Generation runs
+model.time_integrate in chunks; ks1d spectral history is converted to
+physical snapshots via the model's own transforms. The cache file format
+and layout are identical to the old torch-FOM pipeline -- a torch-saved
+float64 tensor of POST-burn-in physical snapshots, (state_dim, Ncols), at
+get_simulation_path(model)/full_trajectory.pth -- so existing caches hit.
+Cache-hit rule unchanged: cached_cols &gt;= Ntot -&gt; last Ntot columns.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>Ntot</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of kept snapshots to return after discarding i0 transient steps.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>model</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dynamodels FOM (from build_fom).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>i0</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of initial transient steps to skip (default 0). Only used
+when generating from scratch; the cache stores post-burn-in states.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Trajectory tensor with shape (state_dim, Ntot), float64, CPU.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_ks.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_full_trajectory</span><span class="p">(</span>
+    <span class="n">Ntot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">i0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Compute or load the full physical trajectory of a KS FOM.</span>
+
+<span class="sd">    Works for both 1D and 2D KS: `model` is the CONSTRUCTED dynamodels model</span>
+<span class="sd">    returned by build_fom (physical.KS or physical.KS2D). Generation runs</span>
+<span class="sd">    model.time_integrate in chunks; ks1d spectral history is converted to</span>
+<span class="sd">    physical snapshots via the model's own transforms. The cache file format</span>
+<span class="sd">    and layout are identical to the old torch-FOM pipeline -- a torch-saved</span>
+<span class="sd">    float64 tensor of POST-burn-in physical snapshots, (state_dim, Ncols), at</span>
+<span class="sd">    get_simulation_path(model)/full_trajectory.pth -- so existing caches hit.</span>
+<span class="sd">    Cache-hit rule unchanged: cached_cols &gt;= Ntot -&gt; last Ntot columns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Ntot: Number of kept snapshots to return after discarding i0 transient steps.</span>
+<span class="sd">        model: dynamodels FOM (from build_fom).</span>
+<span class="sd">        i0: Number of initial transient steps to skip (default 0). Only used</span>
+<span class="sd">            when generating from scratch; the cache stores post-burn-in states.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Trajectory tensor with shape (state_dim, Ntot), float64, CPU.</span>
+<span class="sd">    """</span>
+    <span class="n">get_simulation_path</span><span class="p">,</span> <span class="n">to_columns</span><span class="p">,</span> <span class="n">to_psi</span> <span class="o">=</span> <span class="n">_fom_conversions</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">n_state</span> <span class="o">=</span> <span class="n">state_dim</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># ~8 MB of dynamodels history per chunk keeps memory flat for any grid size.</span>
+    <span class="n">chunk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1_000_000</span> <span class="o">//</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_state</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_advance</span><span class="p">(</span><span class="n">nsteps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Advance the model nsteps without keeping history; returns nothing."""</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">done</span> <span class="o">&lt;</span> <span class="n">nsteps</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">nsteps</span> <span class="o">-</span> <span class="n">done</span><span class="p">)</span>
+            <span class="n">psi</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">time_integrate</span><span class="p">(</span><span class="n">Nt</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">update_history</span><span class="p">(</span><span class="n">psi</span><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">done</span> <span class="o">+=</span> <span class="n">n</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect</span><span class="p">(</span><span class="n">n_keep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">keep_current</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Collect n_keep physical snapshot columns, optionally starting with the</span>
+<span class="sd">        model's current state, integrating in chunks (history reset each chunk)."""</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_state</span><span class="p">,</span> <span class="n">n_keep</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">)</span>
+        <span class="n">kept</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">keep_current</span> <span class="ow">and</span> <span class="n">n_keep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">current_state</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">buf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_columns</span><span class="p">(</span><span class="n">cur</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">kept</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">t_start</span> <span class="o">=</span> <span class="n">t_last_print</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">kept</span> <span class="o">&lt;</span> <span class="n">n_keep</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">n_keep</span> <span class="o">-</span> <span class="n">kept</span><span class="p">)</span>
+            <span class="n">psi</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">time_integrate</span><span class="p">(</span><span class="n">Nt</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">update_history</span><span class="p">(</span><span class="n">psi</span><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">buf</span><span class="p">[:,</span> <span class="n">kept</span><span class="p">:</span><span class="n">kept</span> <span class="o">+</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_columns</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+            <span class="n">kept</span> <span class="o">+=</span> <span class="n">n</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="n">t_last_print</span> <span class="o">&gt;=</span> <span class="mf">15.0</span><span class="p">:</span>
+                <span class="n">rate</span> <span class="o">=</span> <span class="n">kept</span> <span class="o">/</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">t_start</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ...integrating snapshot </span><span class="si">{</span><span class="n">kept</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_keep</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">kept</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">n_keep</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%), "</span>
+                      <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rate</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> steps/s, ETA </span><span class="si">{</span><span class="p">(</span><span class="n">n_keep</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">kept</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">rate</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s"</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">t_last_print</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="k">return</span> <span class="n">buf</span>
+
+    <span class="c1"># Get save directory and filename</span>
+    <span class="n">save_dir</span> <span class="o">=</span> <span class="n">get_simulation_path</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">save_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s2">"full_trajectory.pth"</span><span class="p">)</span>
+
+    <span class="n">spatial_dim</span> <span class="o">=</span> <span class="n">n_state</span>  <span class="c1"># flattened physical state length (1D: Nx, 2D: Nx*Ny)</span>
+
+    <span class="c1"># Try to load cached trajectory. Always load to CPU: the trajectory can be very large</span>
+    <span class="c1"># (hundreds of thousands of snapshots) and callers already move the slices they need to</span>
+    <span class="c1"># model.device explicitly (build_local_model, sweep_qlrom_diagnosis, etc.) -- loading the</span>
+    <span class="c1"># whole thing onto the GPU here just risks an OOM for no benefit.</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_filename</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loading full trajectory from cache: </span><span class="si">{</span><span class="n">save_filename</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+            <span class="c1"># Try with safe_globals if available (for compatibility with older PyTorch/NumPy)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">safe_globals</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="s1">'_core'</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">_core</span><span class="p">,</span> <span class="s1">'multiarray'</span><span class="p">):</span>
+                    <span class="n">safe_globals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">_core</span><span class="o">.</span><span class="n">multiarray</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">serialization</span><span class="o">.</span><span class="n">safe_globals</span><span class="p">(</span><span class="n">safe_globals</span><span class="p">):</span>
+                    <span class="n">full_trajectory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                        <span class="n">save_filename</span><span class="p">,</span>
+                        <span class="n">map_location</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span>
+                        <span class="n">weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># trusted local files</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="n">torch</span><span class="o">.</span><span class="n">OutOfMemoryError</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">):</span>
+                <span class="c1"># Fallback: load without safe_globals if not available</span>
+                <span class="n">full_trajectory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+                    <span class="n">save_filename</span><span class="p">,</span>
+                    <span class="n">map_location</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span>
+                    <span class="n">weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Validate spatial dimension</span>
+            <span class="k">if</span> <span class="n">spatial_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">spatial_dim</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Loaded trajectory spatial dimension </span><span class="si">{</span><span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> "</span>
+                    <span class="sa">f</span><span class="s2">"does not match FOM spatial dimension </span><span class="si">{</span><span class="n">spatial_dim</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check if we have enough snapshots</span>
+            <span class="k">if</span> <span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">Ntot</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">full_trajectory</span><span class="p">[:,</span> <span class="o">-</span><span class="n">Ntot</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Need more steps; extend trajectory from the last cached state</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Loaded trajectory has </span><span class="si">{</span><span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> snapshots, "</span>
+                    <span class="sa">f</span><span class="s2">"need </span><span class="si">{</span><span class="n">Ntot</span><span class="si">}</span><span class="s2">. Extending by </span><span class="si">{</span><span class="n">Ntot</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> steps."</span>
+                <span class="p">)</span>
+                <span class="n">seed</span> <span class="o">=</span> <span class="n">full_trajectory</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">update_history</span><span class="p">(</span><span class="n">psi</span><span class="o">=</span><span class="n">to_psi</span><span class="p">(</span><span class="n">seed</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                     <span class="n">t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]),</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">steps_to_add</span> <span class="o">=</span> <span class="n">_collect</span><span class="p">(</span><span class="n">Ntot</span> <span class="o">-</span> <span class="n">full_trajectory</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">keep_current</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">full_trajectory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">full_trajectory</span><span class="p">,</span> <span class="n">steps_to_add</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">full_trajectory</span><span class="p">,</span> <span class="n">save_filename</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">torch</span><span class="o">.</span><span class="n">OutOfMemoryError</span><span class="p">:</span>
+            <span class="c1"># A resource error, not a corrupt/incompatible cache -- don't silently discard a</span>
+            <span class="c1"># valid (possibly hours-expensive) cache and trigger a from-scratch rebuild that</span>
+            <span class="c1"># would hit the exact same memory pressure. Let it surface.</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to load cached trajectory (will rebuild): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">full_trajectory</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">full_trajectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Build full trajectory if not loaded or incomplete</span>
+    <span class="k">if</span> <span class="n">full_trajectory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Building full trajectory from scratch..."</span><span class="p">)</span>
+        <span class="c1"># From the model's own initial condition (module.FOM seeds the same</span>
+        <span class="c1"># deterministic IC the old torch FOMs used): burn i0 transient steps,</span>
+        <span class="c1"># then keep Ntot states starting with the state AT step i0 -- the same</span>
+        <span class="c1"># kept-state semantics as the old stepper loop.</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">update_history</span><span class="p">(</span><span class="n">psi</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">psi0</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">t</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">]),</span> <span class="n">reset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i0</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_advance</span><span class="p">(</span><span class="n">i0</span><span class="p">)</span>
+        <span class="n">full_trajectory</span> <span class="o">=</span> <span class="n">_collect</span><span class="p">(</span><span class="n">Ntot</span><span class="p">,</span> <span class="n">keep_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">full_trajectory</span><span class="p">,</span> <span class="n">save_filename</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">full_trajectory</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_ks.load_case" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">load_case</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">Ntrain</span><span class="p">,</span> <span class="n">Ntest</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Cached trajectory of one test case, split into a training and a test window.</p>
+<p><code>module</code> is ks1d or ks2d. The trajectory comes from <code>get_full_trajectory</code> (generated
+and cached on first use), and <code>traj</code> keeps all of it for callers that need more than
+the two windows.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict with <code>name</code>, <code>fom</code>, <code>cfg</code>, <code>dt</code>, <code>shape</code> (the grid (Nx, Ny) that a flattened</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>2-D snapshot reshapes to, None in 1-D), <code>traj</code>, <code>Xtrain</code> (N, Ntrain), <code>Xtest</code></p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(N, Ntest) and <code>save_dir</code>, the cache directory of the ROMs fitted on this window.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_ks.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_case</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">case</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Ntrain</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Ntest</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Cached trajectory of one test case, split into a training and a test window.</span>
+
+<span class="sd">    `module` is ks1d or ks2d. The trajectory comes from `get_full_trajectory` (generated</span>
+<span class="sd">    and cached on first use), and `traj` keeps all of it for callers that need more than</span>
+<span class="sd">    the two windows.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict with `name`, `fom`, `cfg`, `dt`, `shape` (the grid (Nx, Ny) that a flattened</span>
+<span class="sd">        2-D snapshot reshapes to, None in 1-D), `traj`, `Xtrain` (N, Ntrain), `Xtest`</span>
+<span class="sd">        (N, Ntest) and `save_dir`, the cache directory of the ROMs fitted on this window.</span>
+<span class="sd">    """</span>
+    <span class="n">fom</span><span class="p">,</span> <span class="n">cfg</span> <span class="o">=</span> <span class="n">build_fom</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="n">case</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">{</span><span class="s2">"Ntrain"</span><span class="p">:</span> <span class="n">Ntrain</span><span class="p">,</span> <span class="s2">"Ntest"</span><span class="p">:</span> <span class="n">Ntest</span><span class="p">})</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="n">get_full_trajectory</span><span class="p">(</span><span class="n">Ntot</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"i0"</span><span class="p">]</span> <span class="o">+</span> <span class="n">Ntrain</span> <span class="o">+</span> <span class="n">Ntest</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">fom</span><span class="p">,</span> <span class="n">i0</span><span class="o">=</span><span class="n">cfg</span><span class="p">[</span><span class="s2">"i0"</span><span class="p">])</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fom</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">case</span><span class="p">,</span> <span class="n">fom</span><span class="o">=</span><span class="n">fom</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fom</span><span class="o">.</span><span class="n">Nx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">fom</span><span class="o">.</span><span class="n">Ny</span><span class="p">))</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fom</span><span class="p">,</span> <span class="s2">"Ny"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">traj</span><span class="o">=</span><span class="n">traj</span><span class="p">,</span> <span class="n">Xtrain</span><span class="o">=</span><span class="n">traj</span><span class="p">[:,</span> <span class="p">:</span><span class="n">Ntrain</span><span class="p">],</span> <span class="n">Xtest</span><span class="o">=</span><span class="n">traj</span><span class="p">[:,</span> <span class="n">Ntrain</span><span class="p">:</span><span class="n">Ntrain</span> <span class="o">+</span> <span class="n">Ntest</span><span class="p">],</span>
+                <span class="n">save_dir</span><span class="o">=</span><span class="n">module</span><span class="o">.</span><span class="n">get_simulation_path</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">fom</span><span class="p">,</span> <span class="n">Ntrain</span><span class="o">=</span><span class="n">Ntrain</span><span class="p">,</span> <span class="n">Ntest</span><span class="o">=</span><span class="n">Ntest</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="qlroms.intrusive_qlroms.build_pinball" class="doc doc-heading">
+            <code>qlroms.intrusive_qlroms.build_pinball</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Pinball snapshot loading -- the build_ks analog.</p>
+<p>Snapshots are written by PinballFOM.run() (scripts/pinball/run_pinball_fom.py) as
+<quantity>_*.npy + snapshot_metadata.npz under qlroms.utils.paths.PINBALL_SNAPSHOTS
+(or any directory passed in). Models are built and cached by
+qlroms.intrusive_qlroms.pinball.rom.build_local_model (intrusive Galerkin; dolfinx
+only on a cache miss). No dolfinx anywhere in this module.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.load_mass_matrix" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">load_mass_matrix</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">'velocity'</span><span class="p">,</span> <span class="n">mesh_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_dof</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>The FEM mass matrix of the pinball's Taylor-Hood velocity ("velocity") or pressure
+("pressure") space as a torch sparse tensor -- the inner product of the charts, the
+clustering, the chart assignment and every error of the models built on the snapshots.
+Read from the sidecar file written next to the mesh (aux_fenics.export_mass_matrices, run
+by build_local_model, or <code>run_pinball_fom.py --export-mass</code>), so no dolfinx is needed.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>kind</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"velocity" or "pressure".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;velocity&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>mesh_dir</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>directory of the mesh (default qlroms.utils.paths.PINBALL_MESHES).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_dof</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>expected dof count (e.g. the snapshot matrix's rows); a mesh that does not
+match the snapshots fails here instead of producing a wrong metric.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_mass_matrix</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"velocity"</span><span class="p">,</span> <span class="n">mesh_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_dof</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The FEM mass matrix of the pinball's Taylor-Hood velocity ("velocity") or pressure</span>
+<span class="sd">    ("pressure") space as a torch sparse tensor -- the inner product of the charts, the</span>
+<span class="sd">    clustering, the chart assignment and every error of the models built on the snapshots.</span>
+<span class="sd">    Read from the sidecar file written next to the mesh (aux_fenics.export_mass_matrices, run</span>
+<span class="sd">    by build_local_model, or `run_pinball_fom.py --export-mass`), so no dolfinx is needed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        kind: "velocity" or "pressure".</span>
+<span class="sd">        mesh_dir: directory of the mesh (default qlroms.utils.paths.PINBALL_MESHES).</span>
+<span class="sd">        n_dof: expected dof count (e.g. the snapshot matrix's rows); a mesh that does not</span>
+<span class="sd">            match the snapshots fails here instead of producing a wrong metric.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"velocity"</span><span class="p">,</span> <span class="s2">"pressure"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"kind must be 'velocity' or 'pressure', got </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="n">mesh_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">mesh_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">mesh_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">paths</span><span class="o">.</span><span class="n">PINBALL_MESHES</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">mesh_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"pinball_mass_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">.npz"</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> not found -- write it once (needs dolfinx) with "</span>
+            <span class="s2">"`python scripts/pinball/run_pinball_fom.py configs/pinball_fom.yml --export-mass`."</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">load_weight</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_dof</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_dof</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"the </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> mass matrix in </span><span class="si">{</span><span class="n">mesh_dir</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> dofs but the "</span>
+                         <span class="sa">f</span><span class="s2">"snapshots have </span><span class="si">{</span><span class="n">n_dof</span><span class="si">}</span><span class="s2">: the mesh does not belong to this campaign."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">M</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.load_snapshots" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">load_snapshots</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="s1">'velocity'</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rdtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Stack <code>&lt;quantity&gt;_*.npy</code> snapshots into an (Ndof, Nt) matrix, chronological -- only
+the saved snapshots start .. stop-1 (default: all), and only those files are read, so a
+window of a long campaign costs its own size, not the campaign's.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(<span title="X">X</span>, <span title="dt">dt</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>snapshot matrix and the saved-snapshot time spacing from</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>snapshot_metadata.npz (dt * snapshot_interval).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_snapshots</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"velocity"</span><span class="p">,</span>
+                   <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rdtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Stack `&lt;quantity&gt;_*.npy` snapshots into an (Ndof, Nt) matrix, chronological -- only</span>
+<span class="sd">    the saved snapshots start .. stop-1 (default: all), and only those files are read, so a</span>
+<span class="sd">    window of a long campaign costs its own size, not the campaign's.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (X, dt): snapshot matrix and the saved-snapshot time spacing from</span>
+<span class="sd">        snapshot_metadata.npz (dt * snapshot_interval).</span>
+<span class="sd">    """</span>
+    <span class="n">snapshot_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">snapshot_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">PINBALL_SNAPSHOTS</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">_*.npy"</span><span class="p">))[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">_*.npy snapshots in </span><span class="si">{</span><span class="n">snapshot_dir</span><span class="si">}</span><span class="s2"> (window [</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">stop</span><span class="si">}</span><span class="s2">))."</span><span class="p">)</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">first</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">first</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>   <span class="c1"># filled in place: np.stack would hold</span>
+    <span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span>                                              <span class="c1"># every file AND the stack, twice the peak</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rdtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">snapshot_dir</span> <span class="o">/</span> <span class="s2">"snapshot_metadata.npz"</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">"dt"</span><span class="p">])</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">"snapshot_interval"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.snapshot_time_index" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">snapshot_time_index</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="o">=</span><span class="s1">'velocity'</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Monotone integer time index for a regression fit's time_index=..., one
+entry per sorted <code>&lt;quantity&gt;_*.npy</code> file: +1 where consecutive files are exactly
+<code>snapshot_interval</code> solver steps apart, +2 (a gap -&gt; non-adjacent) anywhere the
+step sequence is irregular. The fom_re130 warm-restart seam is the motivating
+case: ..., 3996, 3998, 3999, 4001, ... -- the 3998 -&gt; 3999 pair is half a
+snapshot interval apart, so it must not become a regression pair.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">snapshot_time_index</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"velocity"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Monotone integer time index for a regression fit's time_index=..., one</span>
+<span class="sd">    entry per sorted `&lt;quantity&gt;_*.npy` file: +1 where consecutive files are exactly</span>
+<span class="sd">    `snapshot_interval` solver steps apart, +2 (a gap -&gt; non-adjacent) anywhere the</span>
+<span class="sd">    step sequence is irregular. The fom_re130 warm-restart seam is the motivating</span>
+<span class="sd">    case: ..., 3996, 3998, 3999, 4001, ... -- the 3998 -&gt; 3999 pair is half a</span>
+<span class="sd">    snapshot interval apart, so it must not become a regression pair."""</span>
+    <span class="n">snapshot_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">snapshot_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">PINBALL_SNAPSHOTS</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">_*.npy"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s2">_*.npy snapshots in </span><span class="si">{</span><span class="n">snapshot_dir</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">])</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">snapshot_dir</span> <span class="o">/</span> <span class="s2">"snapshot_metadata.npz"</span><span class="p">)[</span><span class="s2">"snapshot_interval"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span> <span class="o">==</span> <span class="n">interval</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))])</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.merge_restart_snapshot_metadata" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">merge_restart_snapshot_metadata</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="p">,</span> <span class="n">previous_metadata</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Fold an exact restart leg's own snapshot_metadata.npz back into the campaign it
+continued, into one file describing the whole thing.</p>
+<p>PinballFOM.run() clears its bookkeeping and overwrites snapshot_metadata.npz on every
+call (qlroms.intrusive_qlroms.pinball.solver.py's run()), so after
+init_velocity_prev-based exact restart (see PinballFOMParameters), the file on disk
+describes only the just-completed leg's own steps -- not the campaign as a whole. This
+merges it back with a saved copy of the metadata from before that leg ran, producing a
+single file indistinguishable from what one uninterrupted run of the combined step count
+would have written: saved_steps/saved_times concatenated and checked for a uniform,
+gap- and duplicate-free spacing (an exact restart's saved_times are already
+campaign-relative, not leg-local -- solver.py's run() seeds self.time from the restart's
+own step offset), everything else taken from the first leg except num_steps (summed).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>snapshot_dir</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the campaign directory (its CURRENT snapshot_metadata.npz is read as
+the just-completed leg and then overwritten with the merged result).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>previous_metadata</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>path to a copy of snapshot_metadata.npz taken before that leg's
+run() call (its own overwrite would otherwise destroy the earlier legs' record);
+run() leaves it as snapshot_metadata_before_&lt;the leg's first index&gt;.npz.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+        <p>Returns:
+    the (now merged) snapshot_metadata.npz path.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge_restart_snapshot_metadata</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="p">,</span> <span class="n">previous_metadata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Fold an exact restart leg's own snapshot_metadata.npz back into the campaign it</span>
+<span class="sd">    continued, into one file describing the whole thing.</span>
+
+<span class="sd">    PinballFOM.run() clears its bookkeeping and overwrites snapshot_metadata.npz on every</span>
+<span class="sd">    call (qlroms.intrusive_qlroms.pinball.solver.py's run()), so after</span>
+<span class="sd">    init_velocity_prev-based exact restart (see PinballFOMParameters), the file on disk</span>
+<span class="sd">    describes only the just-completed leg's own steps -- not the campaign as a whole. This</span>
+<span class="sd">    merges it back with a saved copy of the metadata from before that leg ran, producing a</span>
+<span class="sd">    single file indistinguishable from what one uninterrupted run of the combined step count</span>
+<span class="sd">    would have written: saved_steps/saved_times concatenated and checked for a uniform,</span>
+<span class="sd">    gap- and duplicate-free spacing (an exact restart's saved_times are already</span>
+<span class="sd">    campaign-relative, not leg-local -- solver.py's run() seeds self.time from the restart's</span>
+<span class="sd">    own step offset), everything else taken from the first leg except num_steps (summed).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        snapshot_dir: the campaign directory (its CURRENT snapshot_metadata.npz is read as</span>
+<span class="sd">            the just-completed leg and then overwritten with the merged result).</span>
+<span class="sd">        previous_metadata: path to a copy of snapshot_metadata.npz taken before that leg's</span>
+<span class="sd">            run() call (its own overwrite would otherwise destroy the earlier legs' record);</span>
+<span class="sd">            run() leaves it as snapshot_metadata_before_&lt;the leg's first index&gt;.npz.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the (now merged) snapshot_metadata.npz path.</span>
+<span class="sd">    """</span>
+    <span class="n">snapshot_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">snapshot_dir</span><span class="p">)</span>
+    <span class="n">meta_path</span> <span class="o">=</span> <span class="n">snapshot_dir</span> <span class="o">/</span> <span class="s2">"snapshot_metadata.npz"</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">previous_metadata</span><span class="p">))</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">meta_path</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"dt"</span><span class="p">,</span> <span class="s2">"snapshot_interval"</span><span class="p">,</span> <span class="s2">"reynolds"</span><span class="p">,</span> <span class="s2">"wall_bc"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">prev</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> differs between the two legs (</span><span class="si">{</span><span class="n">prev</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> vs "</span>
+                             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">!r}</span><span class="s2">) -- these are not two legs of the same campaign."</span><span class="p">)</span>
+
+    <span class="n">saved_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">prev</span><span class="p">[</span><span class="s2">"saved_steps"</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="s2">"saved_steps"</span><span class="p">]])</span>
+    <span class="n">saved_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">prev</span><span class="p">[</span><span class="s2">"saved_times"</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="s2">"saved_times"</span><span class="p">]])</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">saved_steps</span><span class="p">)</span>
+    <span class="n">saved_steps</span><span class="p">,</span> <span class="n">saved_times</span> <span class="o">=</span> <span class="n">saved_steps</span><span class="p">[</span><span class="n">order</span><span class="p">],</span> <span class="n">saved_times</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">prev</span><span class="p">[</span><span class="s2">"snapshot_interval"</span><span class="p">])</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">saved_steps</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">gaps</span> <span class="o">==</span> <span class="n">interval</span><span class="p">):</span>
+        <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">gaps</span> <span class="o">!=</span> <span class="n">interval</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"merged saved_steps is not uniformly spaced by </span><span class="si">{</span><span class="n">interval</span><span class="si">}</span><span class="s2"> (a gap, "</span>
+                         <span class="sa">f</span><span class="s2">"overlap, or duplicate at the join): breaks at "</span>
+                         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">saved_steps</span><span class="p">[</span><span class="n">bad</span><span class="p">],</span><span class="w"> </span><span class="n">saved_steps</span><span class="p">[</span><span class="n">bad</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span>
+        <span class="n">meta_path</span><span class="p">,</span>
+        <span class="n">saved_steps</span><span class="o">=</span><span class="n">saved_steps</span><span class="p">,</span>
+        <span class="n">saved_times</span><span class="o">=</span><span class="n">saved_times</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">prev</span><span class="p">[</span><span class="s2">"dt"</span><span class="p">],</span>
+        <span class="n">snapshot_interval</span><span class="o">=</span><span class="n">prev</span><span class="p">[</span><span class="s2">"snapshot_interval"</span><span class="p">],</span>
+        <span class="n">snapshot_start_step</span><span class="o">=</span><span class="n">prev</span><span class="p">[</span><span class="s2">"snapshot_start_step"</span><span class="p">],</span>
+        <span class="n">num_steps</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">prev</span><span class="p">[</span><span class="s2">"num_steps"</span><span class="p">])</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="s2">"num_steps"</span><span class="p">]),</span>
+        <span class="n">reynolds</span><span class="o">=</span><span class="n">prev</span><span class="p">[</span><span class="s2">"reynolds"</span><span class="p">],</span>
+        <span class="n">wall_bc</span><span class="o">=</span><span class="n">prev</span><span class="p">[</span><span class="s2">"wall_bc"</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">meta_path</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.build_sensor_indices" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">build_sensor_indices</span><span class="p">(</span><span class="n">fom</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="s1">'random'</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sensor dof indices into the stacked velocity state -- the build_ks analog.</p>
+<p>The pinball state is an unstructured Taylor-Hood dof vector, so there is no
+grid to lay sensors on: "random" (the qlROM-DA convention) draws sorted
+velocity-dof indices, "uniform" strides the dof vector (index-uniform, not
+space-uniform). <code>fom</code> is any case handle whose .N is the state dimension.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_sensor_indices</span><span class="p">(</span><span class="n">fom</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">,</span> <span class="n">sampling</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Sensor dof indices into the stacked velocity state -- the build_ks analog.</span>
+
+<span class="sd">    The pinball state is an unstructured Taylor-Hood dof vector, so there is no</span>
+<span class="sd">    grid to lay sensors on: "random" (the qlROM-DA convention) draws sorted</span>
+<span class="sd">    velocity-dof indices, "uniform" strides the dof vector (index-uniform, not</span>
+<span class="sd">    space-uniform). `fom` is any case handle whose .N is the state dimension.</span>
+<span class="sd">    """</span>
+    <span class="n">n_state</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fom</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">n_sensors</span> <span class="o">&lt;=</span> <span class="n">n_state</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n_sensors must be in [1, </span><span class="si">{</span><span class="n">n_state</span><span class="si">}</span><span class="s2">], got </span><span class="si">{</span><span class="n">n_sensors</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sampling</span> <span class="o">==</span> <span class="s2">"random"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n_state</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span>
+                                                          <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">sampling</span> <span class="o">!=</span> <span class="s2">"uniform"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"unknown sensor sampling mode: </span><span class="si">{</span><span class="n">sampling</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_state</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.campaign_name" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">campaign_name</span><span class="p">(</span><span class="n">reynolds</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Snapshot-campaign name: fom_re140 untagged (the historical layout), fom_re140__<tag>
+for a repeated run at the same Reynolds number. The name is the snapshot directory, the
+prefix of the run results and (via the tag) part of the model cache key, so a tagged
+campaign shares -- and overwrites -- nothing with the untagged one.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">campaign_name</span><span class="p">(</span><span class="n">reynolds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Snapshot-campaign name: fom_re140 untagged (the historical layout), fom_re140__&lt;tag&gt;</span>
+<span class="sd">    for a repeated run at the same Reynolds number. The name is the snapshot directory, the</span>
+<span class="sd">    prefix of the run results and (via the tag) part of the model cache key, so a tagged</span>
+<span class="sd">    campaign shares -- and overwrites -- nothing with the untagged one."""</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[A-Za-z0-9][A-Za-z0-9._-]*"</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"campaign tag </span><span class="si">{</span><span class="n">tag</span><span class="si">!r}</span><span class="s2">: use letters, digits and . _ - only"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"fom_re</span><span class="si">{</span><span class="n">reynolds</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">"</span> <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">"__</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">tag</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.config_campaign" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">config_campaign</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Campaign name of a FOM config (configs/pinball_<em>.yml): its fom.reynolds and top-level
+<code>tag</code> (absent or null -&gt; the untagged fom_re<Re>). The one place a campaign's tag is set:
+run_pinball_fom.py, the build_re</em>_roms.py scripts and the postprocessing all read it here.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">config_campaign</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Campaign name of a FOM config (configs/pinball_*.yml): its fom.reynolds and top-level</span>
+<span class="sd">    `tag` (absent or null -&gt; the untagged fom_re&lt;Re&gt;). The one place a campaign's tag is set:</span>
+<span class="sd">    run_pinball_fom.py, the build_re*_roms.py scripts and the postprocessing all read it here."""</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">return</span> <span class="n">campaign_name</span><span class="p">(</span><span class="nb">float</span><span class="p">((</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"fom"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"reynolds"</span><span class="p">,</span> <span class="mf">130.0</span><span class="p">)),</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tag"</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.parse_campaign" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">parse_campaign</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>(reynolds, tag) of a campaign name, the inverse of campaign_name:
+fom_re140 -&gt; (140.0, None), fom_re140__long -&gt; (140.0, "long").</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">parse_campaign</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""(reynolds, tag) of a campaign name, the inverse of campaign_name:</span>
+<span class="sd">    fom_re140 -&gt; (140.0, None), fom_re140__long -&gt; (140.0, "long")."""</span>
+    <span class="n">base</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">tag</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">"__"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_re"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">tag</span> <span class="ow">or</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="qlroms.intrusive_qlroms.build_pinball.load_intrusive_model" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">load_intrusive_model</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Xtrain</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">r_velocity</span><span class="p">,</span> <span class="n">r_pressure</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cluster_space</span><span class="o">=</span><span class="s1">'pod_lossless'</span><span class="p">,</span> <span class="n">cluster_metric</span><span class="o">=</span><span class="s1">'mass'</span><span class="p">,</span> <span class="n">pressure_centroid</span><span class="o">=</span><span class="s1">'poisson_from_velocity_centroid'</span><span class="p">,</span> <span class="n">i0</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Intrusive qlGalerkin for a snapshot campaign, from the <code>build_local_model</code> cache.</p>
+<p>The Reynolds number and the tag come from the campaign name (fom_re120 -&gt; 120,
+fom_re140__long -&gt; 140 with its own cache files, see campaign_name). On a cache
+miss the model is built only if <code>build=True</code> (dolfinx, about 1 h at K=8 on 6000
+snapshots); otherwise this prints the build call and returns None, so notebooks
+stay cheap. The pressure snapshots are read only when a build is needed.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>dataset</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>campaign name, e.g. "fom_re120" or "fom_re140__long".</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>Xtrain</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(N, T) velocity training snapshots -- the window [i0, i0+T) of the
+campaign's own snapshot sequence. Pass <code>i0</code> whenever Xtrain does not start at
+the campaign's first saved snapshot (e.g. Xtrain = X[:, i0:i0+Ntrain] from a
+larger loaded X), or the pressure window read on a cache miss would silently
+come from the WRONG instants (always the campaign's own first T snapshots),
+not the ones Xtrain's velocity columns actually are.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>i0</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>index of Xtrain's first column within the campaign's own snapshot sequence
+(default 0, i.e. Xtrain starts at the beginning).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+        <p>Returns:
+    the qlGalerkin, or None. Each chart has r_velocity + r_pressure + 1 velocity
+    coordinates (POD modes plus one supremizer per pressure mode and pressure mean).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>qlroms/intrusive_qlroms/build_pinball.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_intrusive_model</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Xtrain</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">K</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r_velocity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r_pressure</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                         <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">build</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                         <span class="n">cluster_space</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"pod_lossless"</span><span class="p">,</span>
+                         <span class="n">cluster_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mass"</span><span class="p">,</span>
+                         <span class="n">pressure_centroid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"poisson_from_velocity_centroid"</span><span class="p">,</span>
+                         <span class="n">i0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Intrusive qlGalerkin for a snapshot campaign, from the `build_local_model` cache.</span>
+
+<span class="sd">    The Reynolds number and the tag come from the campaign name (fom_re120 -&gt; 120,</span>
+<span class="sd">    fom_re140__long -&gt; 140 with its own cache files, see campaign_name). On a cache</span>
+<span class="sd">    miss the model is built only if `build=True` (dolfinx, about 1 h at K=8 on 6000</span>
+<span class="sd">    snapshots); otherwise this prints the build call and returns None, so notebooks</span>
+<span class="sd">    stay cheap. The pressure snapshots are read only when a build is needed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: campaign name, e.g. "fom_re120" or "fom_re140__long".</span>
+<span class="sd">        Xtrain: (N, T) velocity training snapshots -- the window [i0, i0+T) of the</span>
+<span class="sd">            campaign's own snapshot sequence. Pass `i0` whenever Xtrain does not start at</span>
+<span class="sd">            the campaign's first saved snapshot (e.g. Xtrain = X[:, i0:i0+Ntrain] from a</span>
+<span class="sd">            larger loaded X), or the pressure window read on a cache miss would silently</span>
+<span class="sd">            come from the WRONG instants (always the campaign's own first T snapshots),</span>
+<span class="sd">            not the ones Xtrain's velocity columns actually are.</span>
+<span class="sd">        K, r_velocity, r_pressure, dt, random_state, cluster_space, cluster_metric,</span>
+<span class="sd">            pressure_centroid: forwarded to build_local_model AND to intrusive_model_path,</span>
+<span class="sd">            so the cache key always matches exactly what a build with these settings would</span>
+<span class="sd">            produce (Ntrain is read off Xtrain itself).</span>
+<span class="sd">        i0: index of Xtrain's first column within the campaign's own snapshot sequence</span>
+<span class="sd">            (default 0, i.e. Xtrain starts at the beginning).</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the qlGalerkin, or None. Each chart has r_velocity + r_pressure + 1 velocity</span>
+<span class="sd">        coordinates (POD modes plus one supremizer per pressure mode and pressure mean).</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.pinball.rom</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_local_model</span><span class="p">,</span> <span class="n">intrusive_model_path</span>
+
+    <span class="n">reynolds</span><span class="p">,</span> <span class="n">tag</span> <span class="o">=</span> <span class="n">parse_campaign</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">intrusive_model_path</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">r_velocity</span><span class="p">,</span> <span class="n">r_pressure</span><span class="p">,</span> <span class="n">reynolds</span><span class="p">,</span> <span class="n">Ntrain</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">Xtrain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                                 <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span> <span class="n">cluster_space</span><span class="o">=</span><span class="n">cluster_space</span><span class="p">,</span>
+                                 <span class="n">cluster_metric</span><span class="o">=</span><span class="n">cluster_metric</span><span class="p">,</span> <span class="n">pressure_centroid</span><span class="o">=</span><span class="n">pressure_centroid</span><span class="p">,</span>
+                                 <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cache</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">build</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no cached intrusive model at </span><span class="si">{</span><span class="n">cache</span><span class="si">}</span><span class="s2"> -- build it with build=True (dolfinx, ~1 h at K=8)"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">Xp</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cache</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>   <span class="c1"># only the training window's pressure files are read</span>
+        <span class="n">Xp</span> <span class="o">=</span> <span class="n">load_snapshots</span><span class="p">(</span><span class="n">_dataset_dir</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="s2">"pressure"</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">i0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">i0</span> <span class="o">+</span> <span class="n">Xtrain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">Xp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Xtrain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> has only </span><span class="si">{</span><span class="n">Xp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> pressure snapshots in [</span><span class="si">{</span><span class="n">i0</span><span class="si">}</span><span class="s2">, "</span>
+                             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Xtrain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">), the training window of Xtrain"</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">build_local_model</span><span class="p">(</span><span class="n">Xtrain</span><span class="p">,</span> <span class="n">Xp</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">r_velocity</span><span class="o">=</span><span class="n">r_velocity</span><span class="p">,</span> <span class="n">r_pressure</span><span class="o">=</span><span class="n">r_pressure</span><span class="p">,</span>
+                              <span class="n">reynolds</span><span class="o">=</span><span class="n">reynolds</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                              <span class="n">cluster_space</span><span class="o">=</span><span class="n">cluster_space</span><span class="p">,</span> <span class="n">cluster_metric</span><span class="o">=</span><span class="n">cluster_metric</span><span class="p">,</span>
+                              <span class="n">pressure_centroid</span><span class="o">=</span><span class="n">pressure_centroid</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"intrusive model (Re </span><span class="si">{</span><span class="n">reynolds</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">): K=</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">K</span><span class="si">}</span><span class="s2">, chart dim r=</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">r</span><span class="si">}</span><span class="s2"> = "</span>
+          <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">r_velocity</span><span class="si">}</span><span class="s2"> velocity POD + </span><span class="si">{</span><span class="n">r_pressure</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> supremizers"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../js/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

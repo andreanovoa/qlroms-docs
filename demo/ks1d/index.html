@@ -1,0 +1,1826 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Quantized-local reduced-order models (charts, atlas, intrusive qlGalerkin)">
+      
+      
+      
+        <link rel="canonical" href="https://andreanovoa.github.io/qlroms-docs/demo/ks1d/">
+      
+      
+        <link rel="prev" href="../ks2d/">
+      
+      
+        <link rel="next" href="../../api/core/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Chaotic attractor (KS 1-D) - qlroms</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#live-demo-charts-and-modes-on-a-chaotic-attractor" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="qlroms" class="md-header__button md-logo" aria-label="qlroms" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            qlroms
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chaotic attractor (KS 1-D)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/andreanovoa/qlroms" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    andreanovoa/qlroms
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="qlroms" class="md-nav__button md-logo" aria-label="qlroms" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    qlroms
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/andreanovoa/qlroms" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    andreanovoa/qlroms
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../config-builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config-driven builds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Live demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ks2d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Travelling wave (KS 2-D)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chaotic attractor (KS 1-D)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chaotic attractor (KS 1-D)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-read-the-panels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to read the panels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-model-behind-the-sliders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The model behind the sliders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-sweep-shows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the sweep shows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-data-are-produced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the data are produced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1_2" id="__nav_6_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    geometry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    geometry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/charts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    charts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/atlas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    atlas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/transitions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    transitions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/metric/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metric
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1_3" id="__nav_6_1_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dynamics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    dynamics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/core/operators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms.intrusive_qlroms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms.intrusive_qlroms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/intrusive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlGalerkin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/ks1d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ks1d
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/ks2d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ks2d
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pinball/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pinball
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    qlroms.utils
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    qlroms.utils
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    builder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/diagnosis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    diagnosis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/diagnosis_plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    diagnosis_plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/plots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/utils/paths/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    paths
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-read-the-panels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to read the panels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-model-behind-the-sliders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The model behind the sliders
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-sweep-shows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the sweep shows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-data-are-produced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the data are produced
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="live-demo-charts-and-modes-on-a-chaotic-attractor">Live demo: charts and modes on a chaotic attractor</h1>
+<p>A quantized-local reduced-order model is fixed by two numbers: the number of charts,
+<span class="arithmatex">\(K\)</span>, into which the attractor is quantized, and the number of modes per chart, <span class="arithmatex">\(r\)</span>,
+which is the dimension of each local basis. This page lets you move both with a slider
+and shows what each choice changes: which part of the attractor every chart owns, how
+much of a test window the charts represent at all, and how long a closed-loop forecast
+of the reduced model stays on top of the reference solution. Every panel also draws the
+single-chart model at the same number of modes, because quantization is worth something
+only against that baseline.</p>
+<p>The test case is the 1-D Kuramoto–Sivashinsky equation in its chaotic regime, which is
+the case <a href="../../api/ks1d/"><code>qlroms.intrusive_qlroms.ks1d</code></a> registers as <code>"chaotic"</code>. The
+models are intrusive: every chart carries the Kuramoto–Sivashinsky equation projected
+onto its own basis, and the reduced coordinates are handed from chart to chart by the
+transition maps.</p>
+<style>.md-grid { max-width: 1600px; }</style>
+
+<iframe id="ks1d-explorer" src="../ks1d-explorer.html" title="Interactive ql-ROM explorer for the chaotic 1-D Kuramoto-Sivashinsky case" style="width: 100%; height: 1560px; border: 0;"></iframe>
+
+<script>
+(() => {
+  const frame = document.getElementById("ks1d-explorer");
+  const theme = () => (document.body.dataset.mdColorScheme === "slate" ? "dark" : "light");
+  const send = () => frame.contentWindow.postMessage({ ks1dExplorerTheme: theme() }, "*");
+  addEventListener("message", (e) => {
+    const h = e.data && e.data.ks1dExplorerHeight;
+    if (h) frame.style.height = h + "px";
+  });
+  frame.addEventListener("load", send);
+  new MutationObserver(send).observe(document.body, { attributes: true, attributeFilter: ["data-md-color-scheme"] });
+})();
+</script>
+
+<h2 id="how-to-read-the-panels">How to read the panels</h2>
+<p><strong>Attractor and charts.</strong> Every dot is one training snapshot, drawn in the plane of the
+two leading global proper orthogonal decomposition (POD) coefficients and coloured by
+the chart that owns it. The numbered discs are the chart centroids, the black line is the
+closed-loop forecast of the reduced model in the same plane, and the dashed line is the
+forecast of the single-chart model at the same number of modes. Each line stops, with a
+cross, at the instant that forecast leaves the range of the attractor. Moving <span class="arithmatex">\(K\)</span> repartitions the
+same cloud: the charts of the chaotic case cut one connected cloud rather than separate
+lobes, because this attractor does not split into disjoint regimes.</p>
+<p><strong>Space-time forecast.</strong> The field <span class="arithmatex">\(u(x, t)\)</span> of the full-order model, of the selected
+reduced model and of the single-chart model at the same number of modes, all started from
+the same initial condition and drawn on the same colour scale.
+The two fields separate where the forecast loses the phase of the travelling structures,
+which happens the earlier the smaller <span class="arithmatex">\(r\)</span> is.</p>
+<p><strong>Error history.</strong> The forecast error is the relative error of the closed-loop forecast
+against the reference solution. The representation error is what remains when the true
+snapshots are projected onto the charts and lifted back, so it is the floor that no
+forecast on that geometry improves upon. The dashed line is the forecast error of the
+single-chart model, and the fourth tile above reads the difference between the two
+predictability times.</p>
+<p><strong>Predictability over the sweep.</strong> The predictability time of every model of the sweep,
+one cell per pair <span class="arithmatex">\((K, r)\)</span>. Clicking a cell loads that model into the other panels.</p>
+<p><strong>Representation error against one chart.</strong> The same grid, carrying the representation
+error of <span class="arithmatex">\(K\)</span> charts divided by that of a single global basis of the same size, <span class="arithmatex">\(r\)</span>. Below
+1 the charts represent the unseen window better than one global basis at equal cost; above
+1 they represent it worse. The row <span class="arithmatex">\(K = 1\)</span> is 1 by construction.</p>
+<p><strong>Chart occupancy.</strong> The fraction of the training attractor each chart owns, next to the
+fraction of the forecast spent in it. A forecast that visits only some of the charts, or
+that parks in one of them, has left the attractor.</p>
+<p><strong>Chart sequence.</strong> The same occupancy resolved in time: the chart index against time, for
+the forecast and for the true state over the same window. The two agree while the forecast
+is still a forecast, and part at the predictability time, which the dashed line marks. The
+sequence therefore separates the two ways a quantized-local model fails: the state may be
+carried to the wrong chart, and the dynamics within the right chart may still be wrong.</p>
+<h2 id="the-model-behind-the-sliders">The model behind the sliders</h2>
+<p>The full-order model is the 1-D Kuramoto–Sivashinsky equation</p>
+<div class="arithmatex">\[
+\frac{\partial u}{\partial t} + u\,\frac{\partial u}{\partial x}
++ \frac{\partial^2 u}{\partial x^2} + \nu\,\frac{\partial^4 u}{\partial x^4} = 0,
+\tag{1}
+\]</div>
+<p>where <span class="arithmatex">\(u(x, t)\)</span> is the scalar field; <span class="arithmatex">\(\nu\)</span> is the viscosity; and the domain is periodic,
+<span class="arithmatex">\(x \in [0, L)\)</span>. The demo runs the chaotic regime <span class="arithmatex">\(\nu = 1\)</span> and <span class="arithmatex">\(L = 20\pi\)</span>, for which the
+leading Lyapunov exponent is <span class="arithmatex">\(\lambda_1 = 0.062\)</span>, so the Lyapunov time is
+<span class="arithmatex">\(t_\lambda = 1/\lambda_1 = 16.1\)</span>. Equation (1) is discretized on <span class="arithmatex">\(N = 128\)</span> equispaced
+grid points and advanced with a fourth-order exponential time-differencing Runge–Kutta
+scheme with a time step <span class="arithmatex">\(\Delta t = 0.05\)</span>, as proposed by Kassam and Trefethen (2005).
+The state is the vector of grid values, <span class="arithmatex">\(\bm{u} \in \mathbb{R}^{N}\)</span>, and one snapshot is
+one state.</p>
+<p>The charts quantize the attractor. K-means on the training snapshots returns <span class="arithmatex">\(K\)</span>
+centroids <span class="arithmatex">\(\bm{c}_k\)</span>, and chart <span class="arithmatex">\(k\)</span> owns the snapshots whose nearest centroid is
+<span class="arithmatex">\(\bm{c}_k\)</span>. Each chart carries the POD basis <span class="arithmatex">\(\bm{\Phi}_k \in \mathbb{R}^{N \times r}\)</span> of
+its own snapshots, centred on its own centroid, so a state that the chart owns is
+represented as</p>
+<div class="arithmatex">\[
+\bm{u} \approx \bm{c}_k + \bm{\Phi}_k\bm{a},
+\qquad
+\bm{a} = \bm{\Phi}_k^\top\left(\bm{u} - \bm{c}_k\right),
+\tag{2}
+\]</div>
+<p>where <span class="arithmatex">\(\bm{a} \in \mathbb{R}^{r}\)</span> are the reduced coordinates. The two sliders move
+exactly the two numbers of equation (2): <span class="arithmatex">\(K\)</span> sets how many bases there are, and <span class="arithmatex">\(r\)</span> sets
+how many columns each of them has.</p>
+<p>Substituting the representation in equation (2) into equation (1) and projecting onto
+<span class="arithmatex">\(\bm{\Phi}_k\)</span> gives one quadratic system per chart</p>
+<div class="arithmatex">\[
+\dot{\bm{a}} = \bm{b}_k + \mathbf{A}_k\bm{a} + \mathsf{B}_k(\bm{a}, \bm{a}),
+\tag{3}
+\]</div>
+<p>where <span class="arithmatex">\(\bm{b}_k = \bm{\Phi}_k^\top\mathbf{L}\bm{c}_k\)</span> is the constant forcing of the
+centroid; <span class="arithmatex">\(\mathbf{A}_k = \bm{\Phi}_k^\top\mathbf{L}\bm{\Phi}_k\)</span> is the projected linear
+operator, with <span class="arithmatex">\(\mathbf{L}\)</span> the discretization of the second and fourth derivatives of
+equation (1); and <span class="arithmatex">\(\mathsf{B}_k\)</span> is the projected convective term. The quadratic term is
+evaluated by lifting the reduced coordinates to the grid, squaring the field there, and
+projecting the result back, which is exact for a quadratic nonlinearity and costs one
+matrix-vector product per grid point. Equation (3) is advanced with the same
+time-stepping scheme as equation (1), applied to the projected linear operator
+<span class="arithmatex">\(\mathbf{A}_k\)</span>.</p>
+<p>A forecast crosses chart boundaries. At every step the model measures the distance of the
+current reduced state to each centroid, and when the nearest chart changes from <span class="arithmatex">\(j\)</span> to
+<span class="arithmatex">\(k\)</span>, the coordinates are carried over by the transition map</p>
+<div class="arithmatex">\[
+\bm{a}_k = \mathbf{T}_{kj}\bm{a}_j + \bm{d}_{kj},
+\qquad
+\mathbf{T}_{kj} = \bm{\Phi}_k^\top\bm{\Phi}_j,
+\qquad
+\bm{d}_{kj} = \bm{\Phi}_k^\top\left(\bm{c}_j - \bm{c}_k\right).
+\tag{4}
+\]</div>
+<p>The map in equation (4) is exact only in the atlas, the shared global coordinate system
+of <a href="../../api/core/atlas/"><code>qlroms.atlas</code></a>, because two local bases of <span class="arithmatex">\(r &lt; N\)</span> columns do
+not span the same subspace; the part of the state that chart <span class="arithmatex">\(k\)</span> cannot represent is lost
+at the switch. This is one of the two error sources the demo separates, the other being
+the truncation of equation (2) itself.</p>
+<p>The panels report two errors and one time. The representation error</p>
+<div class="arithmatex">\[
+e_\mathrm{rep}(t) = \frac{\left\lVert\bm{u}(t) - \left[\bm{c}_k
++ \bm{\Phi}_k\bm{\Phi}_k^\top\left(\bm{u}(t) - \bm{c}_k\right)\right]\right\rVert}
+{\left\lVert\bm{u}(t)\right\rVert},
+\tag{5}
+\]</div>
+<p>in which <span class="arithmatex">\(k\)</span> is the chart nearest to the true state <span class="arithmatex">\(\bm{u}(t)\)</span>, measures the geometry
+alone, with no time stepping. The forecast error <span class="arithmatex">\(e(t)\)</span> replaces the bracket of equation
+(5) with the closed-loop forecast, which is started from the first test snapshot and
+advanced without ever seeing the reference solution again. The predictability time,
+<span class="arithmatex">\(T_\mathrm{ph}\)</span>, is the first time at which <span class="arithmatex">\(e(t)\)</span> exceeds 0.5, and is reported in
+Lyapunov times, as in Colanera and Magri (2025).</p>
+<h2 id="what-the-sweep-shows">What the sweep shows</h2>
+<p>The dimension of the reduced state sets the predictability time. At <span class="arithmatex">\(r = 20\)</span> modes, the lower end of the sweep, the
+representation error is 0.30 with one chart and 0.24 with ten, and no model survives a
+fifth of a Lyapunov time. At <span class="arithmatex">\(r = 48\)</span> the representation error drops to 0.007 with one
+chart and 0.005 with ten, and the forecasts hold for between 1.2 and 2.3 Lyapunov times;
+at <span class="arithmatex">\(r = 64\)</span>, half of the 128 grid points, the single-chart model reaches 3.6 Lyapunov
+times.</p>
+<p>Quantization lowers the representation error in every cell of the sweep, provided that
+each chart owns enough snapshots. The ratio map states the trade-off: every model with
+more than one chart is below 1, the ratio falls as charts are added up to eight and is
+then flat, and from six charts on it lies between 0.72 and 0.86 at every basis size, with
+the lowest value, 0.72, at eight charts of 64 modes. The gain depends on the amount of
+data each basis is fitted on: a chart owns about <span class="arithmatex">\(N_\mathrm{train}/K\)</span> snapshots, so at
+twelve charts each local basis is built from some 16 700 of the 200 000 training
+snapshots. With a training window of 40 000 snapshots each of the twelve local bases is
+built from some 3 300 snapshots, and a 64-mode basis fitted on that much data does not
+carry to the unseen window: on the same test window, the ratio at twelve charts of 64
+modes is 1.30 instead of 0.77, and every model of eight charts or more is above 1 from
+<span class="arithmatex">\(r = 28\)</span>.</p>
+<p>Predictability follows the modes, not the charts: the predictability times of the whole
+sweep stay within the scatter of one another until <span class="arithmatex">\(r = 32\)</span>. In this configuration the
+charts therefore buy accuracy of representation rather than length of forecast, and a fair
+comparison between <span class="arithmatex">\(K = 1\)</span> and <span class="arithmatex">\(K &gt; 1\)</span> is one at equal <span class="arithmatex">\(r\)</span>, which is what the two sliders
+hold fixed.</p>
+<p>The clustering itself is a choice, and not a given: k-means here runs on the physical
+snapshots, with one snapshot assigned to one chart, and the space it clusters in, the
+tolerance for overlapping assignment and the transition rule are all arguments of
+<a href="../../api/core/charts/"><code>fit_clusters</code></a>. Tutorial
+<a href="../../tutorials/03_diagnosing_a_qlrom.html">3</a> runs the same <span class="arithmatex">\((K, r)\)</span> sweep with the
+diagnosis stack, and tutorial <a href="../../tutorials/01_what_is_a_qlrom.html">1</a> varies those
+clustering arguments.</p>
+<h2 id="how-the-data-are-produced">How the data are produced</h2>
+<p>The page is static: every number it shows is precomputed by one script, and the browser
+only selects between stored states. To regenerate the sweep, or to run it on another case
+or another grid, run</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>scripts/ks/build_web_demo_data.py<span class="w"> </span>--Ntrain<span class="w"> </span><span class="m">200000</span><span class="w"> </span>--Ntest<span class="w"> </span><span class="m">4000</span><span class="w"> </span>--out<span class="w"> </span>docs/demo/data
+</code></pre></div>
+<p>The script generates the trajectory of the full-order model, splits it into a training
+window of 200 000 snapshots and a test window of 4 000 snapshots (<span class="arithmatex">\(12.4\,t_\lambda\)</span>), fits
+the charts once per <span class="arithmatex">\(K\)</span> with <code>build_local_model</code>, truncates that model to each <span class="arithmatex">\(r\)</span>, and
+forecasts in closed loop from the first test snapshot. It writes one JSON file per
+<span class="arithmatex">\((K, r)\)</span> pair, plus an index, which is what the page fetches when a slider moves.</p>
+<p>The length of the training window is set by the local bases, and not by the global basis.
+With 40 000 snapshots instead of 200 000, the representation error of the single-chart
+model changes by 0.003 at <span class="arithmatex">\(r = 32\)</span>, which is 5% of its value, whereas the representation
+error of twelve charts of 64 modes increases by a factor of 1.8, which moves its ratio to
+the single-chart model from 0.77 to 1.30; at 100 000 snapshots that ratio is 0.87. The
+sweep covers <span class="arithmatex">\(K = 1\)</span> to 12 charts and <span class="arithmatex">\(r = 20\)</span> to 64 modes. The upper bound is half of the
+128 grid points, beyond which a reduced-order model of this case is no longer a reduction
+worth making. The lower bound is the point below which the comparison stops carrying
+information: at <span class="arithmatex">\(r = 16\)</span> or fewer modes the representation error exceeds 0.31, every model
+of the sweep leaves the attractor in about a tenth of a Lyapunov time, and one dead
+forecast cannot be told from another.</p>
+<p>Two caveats follow from the design. Each cell of the sweep is a single forecast from a
+single initial condition, so its predictability time carries the spread of chaotic
+trajectories and is not an average over the attractor; the diagnosis stack in
+<a href="../../api/utils/diagnosis/"><code>qlroms.utils.diagnosis</code></a> is the tool for averaged statistics.
+The space-time fields are stored as 8-bit images of 200 columns, which is enough to see
+the structures move, but not to measure them.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>Kassam, A.-K., &amp; Trefethen, L. N. (2005). Fourth-order time-stepping for stiff PDEs.
+  <em>SIAM Journal on Scientific Computing</em>, <strong>26</strong>(4), 1214–1233.</li>
+<li>Colanera, A., &amp; Magri, L. (2025). Quantized local reduced-order modeling in time
+  (ql-ROM). <em>Computer Methods in Applied Mechanics and Engineering</em>, <strong>447</strong>, 118393.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../js/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
