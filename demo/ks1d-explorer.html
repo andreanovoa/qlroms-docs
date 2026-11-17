@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ql-ROM explorer: Kuramoto-Sivashinsky</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --plane: #f9f9f7;
+    --border: #dcdbd4;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7973;
+    --grid: #e6e5df;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --series-5: #e87ba4;
+    --series-6: #008300;
+    --series-7: #4a3aa7;
+    --series-8: #e34948;
+    --series-9: #7a5c2e;
+    --series-10: #0f8f96;
+    --series-11: #a03c8c;
+    --series-12: #556070;
+    --accent: #4a3aa7;
+    --critical: #d03b3b;
+    --div-mid: #f0efec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --plane: #0d0d0d;
+      --border: #35342f;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e85;
+      --grid: #2b2b28;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --series-5: #d55181;
+      --series-6: #008300;
+      --series-7: #9085e9;
+      --series-8: #e66767;
+      --series-9: #b08954;
+      --series-10: #3fb3b9;
+      --series-11: #c06fae;
+      --series-12: #8a94a3;
+      --accent: #9085e9;
+      --critical: #e05a5a;
+      --div-mid: #383835;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --plane: #0d0d0d;
+    --border: #35342f;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e85;
+    --grid: #2b2b28;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+    --series-9: #b08954;
+    --series-10: #3fb3b9;
+    --series-11: #c06fae;
+    --series-12: #8a94a3;
+    --accent: #9085e9;
+    --critical: #e05a5a;
+    --div-mid: #383835;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--plane);
+    color: var(--text-primary);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  h2 { font-size: 15px; margin: 0 0 2px; font-weight: 600; }
+  p.sub { margin: 0 0 10px; color: var(--text-secondary); font-size: 12.5px; }
+  .panel {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .controls { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; margin-bottom: 14px; }
+  .slider { flex: 1 1 260px; min-width: 220px; }
+  .slider label { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-secondary); }
+  .slider label b { color: var(--text-primary); font-variant-numeric: tabular-nums; font-size: 15px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); margin-top: 4px; }
+  .ticks { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .tile { flex: 1 1 150px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .tile .k { font-size: 11.5px; color: var(--text-secondary); text-transform: none; }
+  .tile .v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .tile .u { font-size: 11.5px; color: var(--text-muted); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 14px; }
+  .stack { display: grid; gap: 14px; align-content: start; }
+  canvas { width: 100%; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .line-swatch { width: 16px; height: 2px; display: inline-block; }
+  .tip {
+    position: fixed; pointer-events: none; opacity: 0; transition: opacity .08s;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 9px; font-size: 12px; color: var(--text-primary);
+    box-shadow: 0 4px 14px rgba(0,0,0,.16); z-index: 9; font-variant-numeric: tabular-nums;
+  }
+  table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; width: 100%; }
+  th, td { text-align: right; padding: 3px 6px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  details { margin-top: 12px; font-size: 12.5px; color: var(--text-secondary); }
+  summary { cursor: pointer; color: var(--accent); }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  .player { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .player input[type=range] { flex: 1; margin: 0; }
+  .player button { font: inherit; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 2px 10px; cursor: pointer; min-width: 64px; }
+  .player[hidden] { display: none; }
+  @media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite">
+  <div class="controls panel">
+    <div class="slider">
+      <label for="K">Number of charts <b><span id="Kval">-</span></b></label>
+      <input id="K" type="range" min="0" max="0" step="1" value="0" aria-describedby="Khelp">
+      <div class="ticks" id="Kticks"></div>
+      <div id="Khelp" class="note">Charts partition the attractor; each carries its own basis and its own projected equations.</div>
+    </div>
+    <div class="slider">
+      <label for="R">Modes per chart <b><span id="Rval">-</span></b></label>
+      <input id="R" type="range" min="0" max="0" step="1" value="0" aria-describedby="Rhelp">
+      <div class="ticks" id="Rticks"></div>
+      <div id="Rhelp" class="note">Local basis size. The reduced state has this many degrees of freedom at any instant.</div>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">Predictability time</div><div class="v"><span id="tph">-</span></div><div class="u" id="tphNote">Lyapunov times, error threshold 0.5</div></div>
+    <div class="tile"><div class="k">Representation error</div><div class="v"><span id="proj">-</span></div><div class="u">test window projected onto the charts</div></div>
+    <div class="tile"><div class="k">Reduced state size</div><div class="v"><span id="dof">-</span></div><div class="u" id="dofNote">of 128 grid points</div></div>
+    <div class="tile"><div class="k">Charts visited</div><div class="v"><span id="occ">-</span></div><div class="u">by the closed-loop forecast</div></div>
+    <div class="tile" id="refTile"><div class="k">One chart, same modes</div><div class="v"><span id="refTph">-</span></div><div class="u" id="refNote">Lyapunov times</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="stack">
+      <div class="panel">
+        <h2>Attractor and charts</h2>
+        <p class="sub">Training snapshots in the plane of the two leading global POD coefficients, coloured by the chart that owns them. The lines are the closed-loop forecasts, drawn up to the instant each one leaves the range of the attractor, which a cross marks.</p>
+        <canvas id="attractor" data-h="420" style="height: 420px"></canvas>
+        <div class="legend" id="attLegend"></div>
+      </div>
+      <div class="panel">
+        <h2>Predictability over the sweep</h2>
+        <p class="sub">Predictability time of every model in the sweep. Click a cell to load it.</p>
+        <canvas id="heat" data-h="300" style="height: 300px"></canvas>
+        <div class="note" id="heatNote">Rows: charts. Columns: modes per chart.</div>
+      </div>
+      <div class="panel">
+        <h2>Representation error against one chart</h2>
+        <p class="sub">Representation error of K charts divided by that of a single global basis of the same size. Below 1, quantization represents the test window better at equal cost.</p>
+        <canvas id="ratio" data-h="300" style="height: 300px"></canvas>
+        <div class="legend" id="ratioBar"></div>
+        <div class="note">Each cell prints its ratio. A single chart is 1 by construction.</div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel">
+        <h2 id="fieldsTitle">Space-time forecast</h2>
+        <p class="sub" id="fieldsSub">The field u(x, t) of the full-order model, of the selected reduced model, and of the one-chart model at the same number of modes, from the same initial condition and on the same colour scale.</p>
+        <canvas id="fields" data-h="470" style="height: 470px"></canvas>
+        <div class="player" id="player" hidden>
+          <button id="play" type="button">Play</button>
+          <input id="frame" type="range" min="0" max="0" step="1" value="0" aria-label="Time of the snapshots">
+          <span id="frameTime">t = 0</span>
+        </div>
+        <div class="legend" id="fieldLegend"></div>
+      </div>
+      <div class="panel">
+        <h2>Error history</h2>
+        <p class="sub">Relative error of the closed-loop forecast against the reference solution, and the representation error, which is the floor the geometry sets.</p>
+        <canvas id="err" data-h="260" style="height: 260px"></canvas>
+        <div class="legend" id="errLegend"></div>
+      </div>
+      <div class="panel">
+        <h2>Chart occupancy</h2>
+        <p class="sub">Fraction of the training attractor each chart owns, and the fraction of the forecast spent in it.</p>
+        <canvas id="occupancy" data-h="150" style="height: 150px"></canvas>
+        <div class="legend">
+          <span><i class="swatch" style="background: var(--series-1)"></i> training attractor</span>
+          <span><i class="swatch" style="background: var(--series-2)"></i> forecast</span>
+        </div>
+        <details>
+          <summary>Read the numbers as a table</summary>
+          <div id="table"></div>
+        </details>
+      </div>
+      <div class="panel">
+        <h2>Chart sequence</h2>
+        <p class="sub">Which chart holds the state at each instant: the closed-loop forecast, and the full-order model over the same window. Where the two agree, the reduced model is in the chart the physics is in.</p>
+        <canvas id="sequence" data-h="220" style="height: 220px"></canvas>
+        <div class="legend" id="seqLegend"></div>
+      </div>
+    </div>
+  </div>
+  <p class="note" id="caption"></p>
+</div>
+<div class="tip" id="tip" role="status"></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.body).getPropertyValue(name).trim();
+const CAT = (i) => css("--series-" + (i % 12 + 1));
+const tip = $("tip");
+const isDark = () => {
+  const stamp = document.documentElement.dataset.theme;
+  if (stamp) return stamp === "dark";
+  return matchMedia("(prefers-color-scheme: dark)").matches;
+};
+
+let INDEX = null, CUR = null, REF = null;   // REF: the one-chart model at the same r
+const CACHE = new Map();
+let pending = null;
+// ?data=<dir> picks the sweep; the 1-D chaotic case in data/ is the default
+const DATA = new URLSearchParams(location.search).get("data") || "data";
+// time is reported in units of TREF: the Lyapunov time where there is one
+let TREF = 1, TNAME = "", TSYM = "";
+const tphOf = (o) => (o.t_ph_ref ?? o.t_ph_lyap);   // data written before t_ref carry t_ph_lyap
+const tlab = () => (TSYM ? ` ${TSYM}` : "");
+const tfmt = (tmax) => (v) => v.toFixed(tmax >= 20 ? 0 : 1);   // time ticks
+
+function showTip(evt, html) {
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  if (x + w > innerWidth - 4) x = evt.clientX - w - pad;
+  if (y + h > innerHeight - 4) y = evt.clientY - h - pad;
+  tip.style.left = x + "px";
+  tip.style.top = y + "px";
+}
+const hideTip = () => { tip.style.opacity = 0; };
+
+/* ---------- canvas helpers (device-pixel correct, CSS-sized) ---------- */
+const MAX_CANVAS_PX = 12e6;   // backing stores past this fail to allocate in some browsers
+
+function ctxOf(canvas) {
+  // The logical height lives in data-h: width/height below are the BACKING STORE in device
+  // pixels, so reading them back as layout values would rescale the canvas on every redraw.
+  const h = +canvas.dataset.h;
+  const w = canvas.clientWidth;
+  if (!(w > 0)) return null;                       // no layout yet: draw when there is one
+  const dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(MAX_CANVAS_PX / (w * h)));
+  canvas.style.height = h + "px";
+  canvas.width = Math.max(1, Math.round(w * dpr));
+  canvas.height = Math.max(1, Math.round(h * dpr));
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.lineJoin = ctx.lineCap = "round";
+  return { ctx, w, h };
+}
+function axes(ctx, box, opts) {
+  ctx.strokeStyle = css("--grid");
+  ctx.lineWidth = 1;
+  ctx.strokeRect(box.x + 0.5, box.y + 0.5, box.w - 1, box.h - 1);
+  ctx.fillStyle = css("--text-secondary");
+  ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+  if (opts.xlabel) {
+    ctx.textAlign = "center";
+    ctx.fillText(opts.xlabel, box.x + box.w / 2, box.y + box.h + 26);
+  }
+  if (opts.ylabel) {
+    ctx.save();
+    ctx.translate(box.x - 32, box.y + box.h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center";
+    ctx.fillText(opts.ylabel, 0, 0);
+    ctx.restore();
+  }
+}
+function ticksX(ctx, box, lo, hi, n, fmt, grid = true) {
+  ctx.fillStyle = css("--text-muted");
+  ctx.font = "10.5px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  for (let i = 0; i <= n; i++) {
+    const v = lo + (hi - lo) * i / n;
+    const x = box.x + box.w * i / n;
+    ctx.fillText(fmt(v), x, box.y + box.h + 13);
+    if (grid && i > 0 && i < n) {
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath(); ctx.moveTo(x, box.y); ctx.lineTo(x, box.y + box.h); ctx.stroke();
+    }
+  }
+}
+function ticksY(ctx, box, lo, hi, n, fmt, grid = true) {
+  ctx.fillStyle = css("--text-muted");
+  ctx.font = "10.5px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i <= n; i++) {
+    const v = lo + (hi - lo) * i / n;
+    const y = box.y + box.h * (1 - i / n);
+    ctx.fillText(fmt(v), box.x - 6, y);
+    if (grid && i > 0 && i < n) {
+      ctx.strokeStyle = css("--grid");
+      ctx.beginPath(); ctx.moveTo(box.x, y); ctx.lineTo(box.x + box.w, y); ctx.stroke();
+    }
+  }
+  ctx.textBaseline = "alphabetic";
+}
+
+/* ---------- diverging colour map: blue <-> neutral <-> red ---------- */
+function hex2rgb(h) {
+  const v = parseInt(h.slice(1), 16);
+  return [v >> 16 & 255, v >> 8 & 255, v & 255];
+}
+function diverging(t) {  // t in [0, 1]
+  const cold = hex2rgb(css("--series-1")), mid = hex2rgb(css("--div-mid")), warm = hex2rgb(css("--series-8"));
+  const s = t < 0.5 ? t * 2 : (t - 0.5) * 2;
+  const a = t < 0.5 ? cold : mid, b = t < 0.5 ? mid : warm;
+  return [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * s));
+}
+function fieldImage(b64, Nx, Nt) {
+  const bin = atob(b64);
+  const img = new ImageData(Nt, Nx);
+  const lut = [];
+  for (let v = 0; v < 256; v++) lut.push(diverging(v / 255));
+  for (let i = 0; i < Nx; i++) {
+    for (let j = 0; j < Nt; j++) {
+      const c = lut[bin.charCodeAt(i * Nt + j)];
+      const p = (i * Nt + j) * 4;
+      img.data[p] = c[0]; img.data[p + 1] = c[1]; img.data[p + 2] = c[2]; img.data[p + 3] = 255;
+    }
+  }
+  return img;
+}
+
+/* ---------- panels ---------- */
+function drawAttractor() {
+  const cv = $("attractor"), box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const box = { x: 44, y: 12, w: w - 60, h: h - 46 };
+  const A = INDEX.attractor, ch = INDEX.charts[String(CUR.K)];
+  const lim = Math.max(...A.a1.map(Math.abs), ...A.a2.map(Math.abs)) * 1.05;
+  const X = (v) => box.x + box.w * (v + lim) / (2 * lim);
+  const Y = (v) => box.y + box.h * (1 - (v + lim) / (2 * lim));
+  axes(ctx, box, { xlabel: "global POD coefficient a₁", ylabel: "a₂" });
+  ticksX(ctx, box, -lim, lim, 4, (v) => v.toFixed(0));
+  ticksY(ctx, box, -lim, lim, 4, (v) => v.toFixed(0));
+  ctx.globalAlpha = 0.62;
+  for (let i = 0; i < A.a1.length; i++) {
+    ctx.fillStyle = CAT(ch.labels[i]);
+    ctx.beginPath();
+    ctx.arc(X(A.a1[i]), Y(A.a2[i]), 2.2, 0, 6.2832);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // A forecast that leaves the attractor runs far outside the view: clip to the axes and
+  // lift the pen outside them, so a diverged path cannot scribble over the panel.
+  const trajectory = (T2, colour, dash) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(box.x, box.y, box.w, box.h);
+    ctx.clip();
+    ctx.setLineDash(dash);
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    let n = 0;
+    for (let i = 0; i < T2.a1.length; i++) {
+      if (Math.abs(T2.a1[i]) > lim || Math.abs(T2.a2[i]) > lim) break;   // left the attractor
+      const x = X(T2.a1[i]), y = Y(T2.a2[i]);
+      n++ ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    if (n && n < T2.a1.length) {                     // mark where it left
+      ctx.setLineDash([]);
+      ctx.lineWidth = 2;
+      const x = X(T2.a1[n - 1]), y = Y(T2.a2[n - 1]);
+      ctx.beginPath();
+      ctx.moveTo(x - 5, y - 5); ctx.lineTo(x + 5, y + 5);
+      ctx.moveTo(x + 5, y - 5); ctx.lineTo(x - 5, y + 5);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  };
+  if (REF) trajectory(REF.trajectory, css("--series-7"), [5, 3]);
+  trajectory(CUR.trajectory, css("--text-primary"), []);
+  const cx = ch.centroids_view;
+  ctx.font = "600 11px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  for (let k = 0; k < CUR.K; k++) {
+    const x = X(cx[0][k]), y = Y(cx[1][k]);
+    ctx.fillStyle = CAT(k);
+    ctx.strokeStyle = css("--surface-1");
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, 9, 0, 6.2832); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(String(k + 1), x, y + 4);
+  }
+  const leg = $("attLegend");
+  leg.innerHTML = '<span><i class="line-swatch" style="background: var(--text-primary)"></i> reduced-model forecast</span>'
+    + (REF ? '<span><i class="line-swatch" style="background: var(--series-7)"></i> one-chart forecast, same modes</span>' : "")
+    + '<span>numbered discs: chart centroids</span>';
+  cv.onmousemove = (e) => {
+    const rect = cv.getBoundingClientRect();
+    const a1 = (e.clientX - rect.left - box.x) / box.w * 2 * lim - lim;
+    const a2 = lim - (e.clientY - rect.top - box.y) / box.h * 2 * lim;
+    if (a1 < -lim || a1 > lim || a2 < -lim || a2 > lim) return hideTip();
+    let best = -1, bd = 1e9;
+    for (let k = 0; k < CUR.K; k++) {
+      const d = (cx[0][k] - a1) ** 2 + (cx[1][k] - a2) ** 2;
+      if (d < bd) { bd = d; best = k; }
+    }
+    showTip(e, `a₁ = ${a1.toFixed(1)}, a₂ = ${a2.toFixed(1)}<br>nearest chart: ${best + 1}`);
+  };
+  cv.onmouseleave = hideTip;
+}
+
+/* 2-D field: the full-order, reduced and one-chart snapshots u(x, y) side by side at
+   one instant of the test window, which the player below the canvas moves. */
+let FRAME = 0, PLAYING = null;
+function frameImage(b64, f, Nx, Ny) {
+  const bin = atob(b64);
+  const img = new ImageData(Nx, Ny);
+  const lut = [];
+  for (let v = 0; v < 256; v++) lut.push(diverging(v / 255));
+  const off = f * Nx * Ny;
+  for (let i = 0; i < Nx; i++) {
+    for (let j = 0; j < Ny; j++) {
+      const c = lut[bin.charCodeAt(off + i * Ny + j)];
+      const p = ((Ny - 1 - j) * Nx + i) * 4;                  // x to the right, y up
+      img.data[p] = c[0]; img.data[p + 1] = c[1]; img.data[p + 2] = c[2]; img.data[p + 3] = 255;
+    }
+  }
+  return img;
+}
+
+function drawFrames() {
+  const cv = $("fields");
+  const Nx = INDEX.Nx, Ny = INDEX.Ny;
+  const cols = REF ? 3 : 2, gap = 14, top = 22, labelH = 6;
+  // square panels as wide as the row allows, and a canvas exactly as tall as they are
+  const side0 = Math.min((cv.clientWidth - (cols - 1) * gap) / cols, 360);
+  if (side0 > 0) cv.dataset.h = String(Math.round(side0 + top + labelH));
+  const box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const side = Math.min((w - (cols - 1) * gap) / cols, h - top - labelH);
+  const x0 = (w - cols * side - (cols - 1) * gap) / 2;
+  const t = INDEX.t_test[FRAME];
+  const panels = [[INDEX.fom_field, "full-order model"],
+    [CUR.rom_field, `${CUR.K} chart${CUR.K > 1 ? "s" : ""} \u00d7 ${CUR.r} modes`]];
+  if (REF) panels.push([REF.rom_field, `one chart \u00d7 ${CUR.r} modes`]);
+  const off = document.createElement("canvas");
+  off.width = Nx; off.height = Ny;
+  panels.forEach(([b64, title], m) => {
+    off.getContext("2d").putImageData(frameImage(b64, FRAME, Nx, Ny), 0, 0);
+    const x = x0 + m * (side + gap);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(off, x, top, side, side);
+    ctx.strokeStyle = css("--border");
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, top + 0.5, side - 1, side - 1);
+    ctx.fillStyle = css("--text-secondary");
+    ctx.font = "11.5px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(title, x, top - 7);
+  });
+  $("frameTime").textContent = `t = ${(t / TREF).toFixed(1)}${tlab()}`;
+  colourBar();
+  cv.onmousemove = null;
+}
+
+function colourBar() {
+  const leg = $("fieldLegend");
+  leg.innerHTML = "";
+  const bar = document.createElement("canvas");
+  bar.width = 120; bar.height = 10;
+  bar.style.width = "120px"; bar.style.height = "10px";
+  const bctx = bar.getContext("2d");
+  for (let i = 0; i < 120; i++) {
+    const c = diverging(i / 119);
+    bctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+    bctx.fillRect(i, 0, 1, 10);
+  }
+  const span = document.createElement("span");
+  span.append(`u = ${INDEX.vmin.toFixed(1)}`, bar, `${INDEX.vmax.toFixed(1)}`);
+  span.style.gap = "6px";
+  leg.append(span);
+}
+
+function drawFields() {
+  if (INDEX.Ny) return drawFrames();
+  const cv = $("fields"), box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const Nx = INDEX.Nx, Nt = INDEX.t_test.length;
+  const rows = REF ? 3 : 2;
+  const left = 44, right = 16, top = 16, gap = 30, labelH = 30;
+  const panelH = (h - top - (rows - 1) * gap - labelH) / rows;
+  const boxW = w - left - right;
+  const rowY = (i) => top + i * (panelH + gap);
+  const draw = (b64, y0, title) => {
+    const img = fieldImage(b64, Nx, Nt);
+    const off = document.createElement("canvas");
+    off.width = Nt; off.height = Nx;
+    off.getContext("2d").putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(off, left, y0, boxW, panelH);
+    ctx.strokeStyle = css("--border");
+    ctx.lineWidth = 1;
+    ctx.strokeRect(left + 0.5, y0 + 0.5, boxW - 1, panelH - 1);
+    ctx.fillStyle = css("--text-secondary");
+    ctx.font = "11.5px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(title, left, y0 - 5);
+    ctx.save();
+    ctx.translate(left - 28, y0 + panelH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = "center";
+    ctx.fillText("x", 0, 0);
+    ctx.restore();
+  };
+  draw(INDEX.fom_field, rowY(0), "full-order model");
+  draw(CUR.rom_field, rowY(1), `reduced model, ${CUR.K} chart${CUR.K > 1 ? "s" : ""} × ${CUR.r} modes`);
+  if (REF) draw(REF.rom_field, rowY(2), `one chart × ${CUR.r} modes, for comparison`);
+  const tmax = INDEX.t_test[INDEX.t_test.length - 1] / TREF;
+  const box = { x: left, y: rowY(rows - 1), w: boxW, h: panelH };
+  ticksX(ctx, box, 0, tmax, 4, tfmt(tmax), false);
+  ctx.fillStyle = css("--text-secondary");
+  ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`time (${TNAME})`, left + boxW / 2, h - 2);
+  colourBar();
+  cv.onmousemove = (e) => {
+    const rect = cv.getBoundingClientRect();
+    const px = e.clientX - rect.left, py = e.clientY - rect.top;
+    if (px < left || px > left + boxW) return hideTip();
+    const j = Math.min(Nt - 1, Math.max(0, Math.floor((px - left) / boxW * Nt)));
+    const names = ["full-order", `reduced, ${CUR.K} chart${CUR.K > 1 ? "s" : ""}`, "reduced, one chart"];
+    let which = null, i = null;
+    for (let row = 0; row < rows; row++) {
+      const y0 = rowY(row);
+      if (py >= y0 && py <= y0 + panelH) { which = names[row]; i = (py - y0) / panelH; }
+    }
+    if (which === null) return hideTip();
+    const xg = INDEX.x[Math.min(Nx - 1, Math.floor(i * Nx))];
+    showTip(e, `${which}<br>t = ${(INDEX.t_test[j] / TREF).toFixed(2)}${tlab()}, x = ${xg.toFixed(1)}`);
+  };
+  cv.onmouseleave = hideTip;
+}
+
+function drawError() {
+  const cv = $("err"), box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const box = { x: 46, y: 12, w: w - 62, h: h - 48 };
+  const t = INDEX.t_err.map((v) => v / TREF);
+  const tmax = t[t.length - 1], ymax = 1.5;
+  const X = (v) => box.x + box.w * v / tmax;
+  const Y = (v) => box.y + box.h * (1 - Math.min(v, ymax) / ymax);
+  axes(ctx, box, { xlabel: `time (${TNAME})`, ylabel: "relative error" });
+  ticksX(ctx, box, 0, tmax, 4, tfmt(tmax));
+  ticksY(ctx, box, 0, ymax, 3, (v) => v.toFixed(1));
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = css("--text-muted");
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(box.x, Y(0.5)); ctx.lineTo(box.x + box.w, Y(0.5)); ctx.stroke();
+  ctx.setLineDash([]);
+  const line = (ys, colour) => {
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ys.forEach((v, i) => (i ? ctx.lineTo(X(t[i]), Y(v)) : ctx.moveTo(X(t[i]), Y(v))));
+    ctx.stroke();
+  };
+  if (REF) {
+    ctx.setLineDash([5, 3]);
+    line(REF.rel_err, css("--series-7"));
+    ctx.setLineDash([]);
+  }
+  line(CUR.proj_err, css("--series-2"));
+  line(CUR.rel_err, css("--series-1"));
+  const tph = tphOf(CUR);
+  if (tph > 0 && tph < tmax) {
+    ctx.strokeStyle = css("--accent");
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(tph), box.y); ctx.lineTo(X(tph), box.y + box.h); ctx.stroke();
+    ctx.fillStyle = css("--accent");
+    ctx.font = "600 11px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = X(tph) > box.x + box.w * 0.7 ? "right" : "left";
+    ctx.fillText(` T_ph = ${tph.toFixed(2)}${tlab()} `, X(tph), box.y + box.h - 8);
+  }
+  cv.onmousemove = (e) => {
+    const rect = cv.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    if (px < box.x || px > box.x + box.w) return hideTip();
+    const i = Math.min(t.length - 1, Math.max(0, Math.round((px - box.x) / box.w * (t.length - 1))));
+    drawError();
+    ctx.strokeStyle = css("--grid");
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(t[i]), box.y); ctx.lineTo(X(t[i]), box.y + box.h); ctx.stroke();
+    showTip(e, `t = ${t[i].toFixed(2)}${tlab()}<br>forecast ${CUR.rel_err[i].toFixed(2)}`
+      + `<br>representation ${CUR.proj_err[i].toFixed(2)}`
+      + (REF ? `<br>one chart ${REF.rel_err[i].toFixed(2)}` : ""));
+  };
+  cv.onmouseleave = () => { hideTip(); drawError(); };
+  $("errLegend").innerHTML =
+    '<span><i class="line-swatch" style="background: var(--series-1)"></i> forecast error</span>'
+    + '<span><i class="line-swatch" style="background: var(--series-2)"></i> representation error</span>'
+    + (REF ? '<span><i class="line-swatch" style="background: var(--series-7)"></i> forecast error, one chart</span>' : "")
+    + '<span><i class="line-swatch" style="background: var(--text-muted)"></i> threshold 0.5</span>';
+}
+
+/* One (K, r) grid: `value` reads a cell, `colour` paints it, `label` prints in it.
+   Both maps share the selection ring, the axes, the hover and the click-to-load. */
+function drawGrid(cv, { value, colour, label, tip }) {
+  const box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const Ks = INDEX.K_list, Rs = INDEX.r_list;
+  const box = { x: 38, y: 12, w: w - 52, h: h - 46 };
+  const cw = box.w / Rs.length, chh = box.h / Ks.length;
+  Ks.forEach((K, i) => Rs.forEach((r, j) => {
+    const g = INDEX.grid[`${K}_${r}`];
+    const x = box.x + j * cw, y = box.y + i * chh;
+    const v = g ? value(g, K, r) : null;
+    ctx.fillStyle = v === null ? css("--grid") : colour(v);
+    ctx.fillRect(x + 1, y + 1, cw - 2, chh - 2);
+    if (label && v !== null && cw >= 34) {           // direct labels: never colour alone
+      ctx.fillStyle = css("--text-primary");
+      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.globalAlpha = 0.75;
+      ctx.fillText(label(v), x + cw / 2, y + chh / 2);
+      ctx.globalAlpha = 1;
+      ctx.textBaseline = "alphabetic";
+    }
+    if (K === CUR.K && r === CUR.r) {
+      ctx.strokeStyle = css("--text-primary");
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(x + 1.5, y + 1.5, cw - 3, chh - 3);
+    } else if (REF && K === 1 && r === CUR.r) {      // the comparison cell
+      ctx.strokeStyle = css("--series-7");
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.strokeRect(x + 1.5, y + 1.5, cw - 3, chh - 3);
+      ctx.setLineDash([]);
+    }
+  }));
+  ctx.fillStyle = css("--text-muted");
+  ctx.font = "10.5px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  Rs.forEach((r, j) => ctx.fillText(String(r), box.x + (j + 0.5) * cw, box.y + box.h + 13));
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  Ks.forEach((K, i) => ctx.fillText(String(K), box.x - 6, box.y + (i + 0.5) * chh));
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = css("--text-secondary");
+  ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("modes per chart", box.x + box.w / 2, box.y + box.h + 30);
+  ctx.save();
+  ctx.translate(box.x - 26, box.y + box.h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText("charts", 0, 0);
+  ctx.restore();
+  const cellAt = (e) => {
+    const rect = cv.getBoundingClientRect();
+    const j = Math.floor((e.clientX - rect.left - box.x) / cw);
+    const i = Math.floor((e.clientY - rect.top - box.y) / chh);
+    if (i < 0 || j < 0 || i >= Ks.length || j >= Rs.length) return null;
+    return { K: Ks[i], r: Rs[j] };
+  };
+  cv.onmousemove = (e) => {
+    const c = cellAt(e);
+    if (!c) return hideTip();
+    cv.style.cursor = "pointer";
+    showTip(e, tip(c, INDEX.grid[`${c.K}_${c.r}`]));
+  };
+  cv.onmouseleave = hideTip;
+  cv.onclick = (e) => {
+    const c = cellAt(e);
+    if (!c) return;
+    $("K").value = INDEX.K_list.indexOf(c.K);
+    $("R").value = INDEX.r_list.indexOf(c.r);
+    load();
+  };
+}
+
+const cellName = (c) => `${c.K} chart${c.K > 1 ? "s" : ""} \u00d7 ${c.r} modes`;
+
+function drawHeat() {
+  const dark = isDark();
+  const ramp = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"];
+  const seq = dark ? ramp.slice().reverse() : ramp;
+  let vmax = 0;
+  for (const key in INDEX.grid) vmax = Math.max(vmax, tphOf(INDEX.grid[key]));
+  const twin = INDEX.Ntest * INDEX.dt / TREF;     // a forecast that never fails scores the window
+  $("heatNote").innerHTML = "Rows: charts. Columns: modes per chart. "
+    + (dark ? "Lighter" : "Darker") + " is a longer predictability time; \u201call\u201d marks a forecast that holds over the whole test window."
+    + (REF ? " The dashed cell is the one-chart model the panels compare against." : "");
+  drawGrid($("heat"), {
+    value: (g) => tphOf(g),
+    colour: (v) => seq[Math.min(seq.length - 1, Math.floor(v / (vmax + 1e-9) * seq.length))],
+    label: (v) => (v >= twin - 1e-6 ? "all" : v.toFixed(v >= 100 ? 0 : 1)),
+    tip: (c, g) => `${cellName(c)}<br>T<sub>ph</sub> = ${g ? tphOf(g).toFixed(2) : "-"}${tlab()}`
+      + (g && tphOf(g) >= twin - 1e-6 ? " (the whole test window)" : "")
+      + `<br>representation error ${g ? g.proj_err.toFixed(3) : "-"}`,
+  });
+}
+
+/* Representation error of K charts over that of one chart at the SAME r: below 1 the
+   charts represent the test window better than the global basis of equal size. */
+const ratioOf = (g, K, r) => g.proj_err / INDEX.grid[`1_${r}`].proj_err;
+
+function drawRatio() {
+  let span = 0;
+  for (const K of INDEX.K_list) {
+    for (const r of INDEX.r_list) {
+      span = Math.max(span, Math.abs(ratioOf(INDEX.grid[`${K}_${r}`], K, r) - 1));
+    }
+  }
+  span = Math.max(span, 0.05);
+  const colour = (v) => {                 // diverging about 1: blue better, red worse
+    const c = diverging(Math.min(1, Math.max(0, 0.5 + (v - 1) / (2 * span))));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  };
+  drawGrid($("ratio"), {
+    value: ratioOf,
+    colour,
+    label: (v) => v.toFixed(2),
+    tip: (c, g) => `${cellName(c)}<br>representation error ${g ? g.proj_err.toFixed(3) : "-"}`
+      + `<br>one chart at ${c.r} modes ${INDEX.grid[`1_${c.r}`].proj_err.toFixed(3)}`
+      + `<br>ratio ${g ? ratioOf(g, c.K, c.r).toFixed(2) : "-"}`,
+  });
+  const bar = $("ratioBar");
+  bar.innerHTML = "";
+  const cvb = document.createElement("canvas");
+  cvb.width = 120; cvb.height = 10;
+  cvb.style.width = "120px"; cvb.style.height = "10px";
+  const bctx = cvb.getContext("2d");
+  for (let i = 0; i < 120; i++) {
+    bctx.fillStyle = colour(1 - span + 2 * span * i / 119);
+    bctx.fillRect(i, 0, 1, 10);
+  }
+  const span_el = document.createElement("span");
+  span_el.append(`${(1 - span).toFixed(2)} charts better`, cvb, `worse ${(1 + span).toFixed(2)}`);
+  span_el.style.gap = "6px";
+  bar.append(span_el);
+}
+
+function drawOccupancy() {
+  const cv = $("occupancy"), box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const ch = INDEX.charts[String(CUR.K)];
+  const box = { x: 36, y: 10, w: w - 50, h: h - 40 };
+  const K = CUR.K, slot = box.w / K;
+  const vmax = Math.max(...ch.occupancy, ...CUR.cluster_occupancy, 0.05);
+  axes(ctx, box, { xlabel: "chart" });
+  ticksY(ctx, box, 0, vmax, 2, (v) => (100 * v).toFixed(0) + "%");
+  for (let k = 0; k < K; k++) {
+    const bw = (slot - 8) / 2;
+    const pairs = [[ch.occupancy[k], css("--series-1")], [CUR.cluster_occupancy[k] || 0, css("--series-2")]];
+    pairs.forEach(([v, colour], m) => {
+      const bh = box.h * v / vmax;
+      const bx = box.x + k * slot + 4 + m * (bw + 2), by = box.y + box.h - bh;
+      ctx.fillStyle = colour;
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bw, bh, [4, 4, 0, 0]);
+        ctx.fill();
+      } else {
+        ctx.fillRect(bx, by, bw, bh);
+      }
+    });
+    ctx.fillStyle = css("--text-muted");
+    ctx.font = "10.5px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(String(k + 1), box.x + (k + 0.5) * slot, box.y + box.h + 13);
+  }
+  let rows = "<table><tr><th>chart</th><th>training</th><th>forecast</th></tr>";
+  for (let k = 0; k < K; k++) {
+    rows += `<tr><td>${k + 1}</td><td>${(100 * ch.occupancy[k]).toFixed(1)}%</td>`
+      + `<td>${(100 * (CUR.cluster_occupancy[k] || 0)).toFixed(1)}%</td></tr>`;
+  }
+  $("table").innerHTML = rows + "</table>";
+}
+
+/* Chart occupancy in time: chart id against time, for the forecast and for the true
+   state. Where the two agree the reduced model is in the chart the physics is in. */
+function drawSequence() {
+  const cv = $("sequence"), box0 = ctxOf(cv);
+  if (!box0) return;
+  const { ctx, w, h } = box0;
+  const K = CUR.K;
+  const box = { x: 46, y: 12, w: w - 62, h: h - 48 };
+  const t = INDEX.t_err.map((v) => v / TREF);
+  const tmax = t[t.length - 1];
+  const X = (v) => box.x + box.w * v / tmax;
+  const lane = box.h / K;
+  const Y = (k) => box.y + box.h - (k + 0.5) * lane;   // chart 1 at the bottom
+  axes(ctx, box, { xlabel: `time (${TNAME})`, ylabel: "chart" });
+  ticksX(ctx, box, 0, tmax, 4, tfmt(tmax), false);
+  ctx.fillStyle = css("--text-muted");
+  ctx.font = "10.5px ui-sans-serif, system-ui, sans-serif";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let k = 0; k < K; k++) {
+    if (K <= 12 || k % 2 === 0) ctx.fillText(String(k + 1), box.x - 6, Y(k));
+    ctx.strokeStyle = css("--grid");
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(box.x, Y(k)); ctx.lineTo(box.x + box.w, Y(k));
+    ctx.stroke();
+  }
+  ctx.textBaseline = "alphabetic";
+
+  const truth = INDEX.charts[String(K)].path_true;
+  const path = CUR.chart_path;
+  const markH = Math.max(3, Math.min(9, lane * 0.34));
+  // the true state first, as a recessive band behind the forecast
+  if (truth) {
+    ctx.fillStyle = css("--text-muted");
+    ctx.globalAlpha = 0.55;
+    for (let i = 0; i < truth.length; i++) {
+      const x0 = X(t[i]), x1 = i + 1 < t.length ? X(t[i + 1]) : x0 + 1;
+      ctx.fillRect(x0, Y(truth[i]) - markH / 2 - 2, Math.max(1, x1 - x0), markH);
+    }
+    ctx.globalAlpha = 1;
+  }
+  // the forecast, coloured by chart, absent once it has diverged
+  let diverged = null;
+  for (let i = 0; i < path.length; i++) {
+    if (path[i] < 0) { diverged = diverged === null ? t[i] : diverged; continue; }
+    const x0 = X(t[i]), x1 = i + 1 < t.length ? X(t[i + 1]) : x0 + 1;
+    ctx.fillStyle = CAT(path[i]);
+    ctx.fillRect(x0, Y(path[i]) - markH / 2 + 3, Math.max(1, x1 - x0), markH);
+  }
+  const tph = tphOf(CUR);
+  if (tph > 0 && tph < tmax) {                    // where the forecast stops being one
+    ctx.strokeStyle = css("--accent");
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(X(tph), box.y); ctx.lineTo(X(tph), box.y + box.h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  $("seqLegend").innerHTML =
+    '<span><i class="swatch" style="background: var(--text-muted); opacity: .55"></i> full-order model</span>'
+    + '<span><i class="swatch" style="background: linear-gradient(90deg, var(--series-1) 0 33%,'
+    + ' var(--series-3) 33% 66%, var(--series-4) 66%)"></i> forecast, coloured by chart</span>'
+    + (tph > 0 && tph < tmax ? '<span><i class="line-swatch" style="background: var(--accent)"></i> predictability time</span>' : "")
+    + (diverged !== null ? `<span>forecast non-finite after ${diverged.toFixed(1)}${tlab()}</span>` : "");
+
+  cv.onmousemove = (e) => {
+    const rect = cv.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    if (px < box.x || px > box.x + box.w) return hideTip();
+    const i = Math.min(t.length - 1, Math.max(0, Math.round((px - box.x) / box.w * (t.length - 1))));
+    const p = path[i], q = truth ? truth[i] : null;
+    showTip(e, `t = ${t[i].toFixed(2)}${tlab()}`
+      + `<br>forecast: ${p < 0 ? "diverged" : "chart " + (p + 1)}`
+      + (q === null ? "" : `<br>full-order: chart ${q + 1}`));
+  };
+  cv.onmouseleave = hideTip;
+}
+
+function render() {
+  $("Kval").textContent = CUR.K;
+  $("Rval").textContent = CUR.r;
+  const twin = INDEX.Ntest * INDEX.dt / TREF;
+  const tphText = (o) => (tphOf(o) >= twin - 1e-6 ? "\u2265 " : "") + tphOf(o).toFixed(tphOf(o) >= 100 ? 0 : 2);
+  $("tph").textContent = tphText(CUR);
+  $("proj").textContent = CUR.proj_err_mean.toFixed(3);
+  $("dof").textContent = CUR.r;
+  $("occ").textContent = CUR.cluster_occupancy.filter((v) => v > 0).length + " of " + CUR.K;
+  if (REF) {
+    const d = tphOf(CUR) - tphOf(REF);
+    $("refTph").textContent = tphText(REF);
+    $("refNote").innerHTML = `${TNAME} &mdash; ${CUR.K} charts ${d >= 0 ? "gain" : "lose"} `
+      + `${Math.abs(d).toFixed(d >= 100 ? 0 : 2)}${tlab()}, representation ${REF.proj_err_mean.toFixed(3)}`;
+  } else {
+    $("refTph").textContent = tphText(CUR);
+    $("refNote").innerHTML = `${TNAME} &mdash; this <em>is</em> the one-chart model`;
+  }
+  const label = INDEX.label || (`1-D Kuramoto\u2013Sivashinsky, chaotic regime (\u03bd = ${INDEX.visc}, `
+    + `L = ${INDEX.Lx.toFixed(1)}, ${INDEX.Nx} grid points, \u03bb\u2081 = ${INDEX.lamb1})`);
+  $("caption").textContent = `${label}. Model: ${CUR.K} chart`
+    + `${CUR.K > 1 ? "s" : ""} of ${CUR.r} modes, fitted on ${INDEX.Ntrain.toLocaleString()} snapshots.`;
+  drawAttractor();
+  drawFields();
+  drawError();
+  drawHeat();
+  drawRatio();
+  drawOccupancy();
+  drawSequence();
+}
+
+async function fetchCell(key) {
+  if (!CACHE.has(key)) CACHE.set(key, await (await fetch(`${DATA}/${key}.json`)).json());
+  return CACHE.get(key);
+}
+
+async function load() {
+  const K = INDEX.K_list[+$("K").value], r = INDEX.r_list[+$("R").value];
+  $("Kval").textContent = K;
+  $("Rval").textContent = r;
+  const key = `K${K}_r${r}`;
+  pending = key;
+  const [cur, ref] = await Promise.all([fetchCell(key), fetchCell(`K1_r${r}`)]);
+  if (pending !== key) return;            // a newer slider position won the race
+  CUR = cur;
+  REF = K === 1 ? null : ref;             // nothing to compare a one-chart model against
+  render();
+}
+
+function ticks(el, values) {
+  el.innerHTML = values.map((v) => `<span>${v}</span>`).join("");
+}
+
+(async function init() {
+  INDEX = await (await fetch(`${DATA}/index.json`)).json();
+  TREF = INDEX.t_ref || INDEX.t_lyap;
+  TNAME = INDEX.t_ref_name || "Lyapunov times";
+  TSYM = INDEX.t_ref_sym ?? "t\u03bb";
+  $("tphNote").textContent = `${TNAME}, error threshold 0.5`;
+  const N = INDEX.Nx * (INDEX.Ny || 1);
+  $("dofNote").textContent = `of ${N.toLocaleString()} grid points`;
+  if (INDEX.Ny) {                                  // 2-D: snapshots instead of a space-time image
+    const cv = $("fields");
+    cv.dataset.h = "300";
+    cv.style.height = "300px";
+    $("fieldsTitle").textContent = "Snapshots of the forecast";
+    $("fieldsSub").textContent = "The field u(x, y) of the full-order model, of the selected reduced model, "
+      + "and of the one-chart model at the same number of modes, from the same initial condition and on "
+      + "the same colour scale, at the instant the slider sets. Play to watch the wave travel.";
+    const fr = $("frame"), btn = $("play");
+    $("player").hidden = false;
+    fr.max = INDEX.t_test.length - 1;
+    fr.oninput = () => { FRAME = +fr.value; if (CUR) drawFrames(); };
+    const stop = () => { clearInterval(PLAYING); PLAYING = null; btn.textContent = "Play"; };
+    btn.onclick = () => {
+      if (PLAYING) return stop();
+      btn.textContent = "Pause";
+      if (FRAME >= +fr.max) FRAME = 0;
+      PLAYING = setInterval(() => {
+        FRAME = FRAME >= +fr.max ? 0 : FRAME + 1;
+        fr.value = FRAME;
+        if (CUR) drawFrames();
+      }, 120);
+    };
+  }
+  const K = $("K"), R = $("R");
+  K.max = INDEX.K_list.length - 1;
+  R.max = INDEX.r_list.length - 1;
+  const start = INDEX.start || { K: 10, r: 20 };
+  K.value = INDEX.K_list.indexOf(start.K) >= 0 ? INDEX.K_list.indexOf(start.K) : INDEX.K_list.length - 1;
+  R.value = INDEX.r_list.indexOf(start.r) >= 0 ? INDEX.r_list.indexOf(start.r) : INDEX.r_list.length - 1;
+  ticks($("Kticks"), [INDEX.K_list[0], INDEX.K_list[INDEX.K_list.length - 1]]);
+  ticks($("Rticks"), [INDEX.r_list[0], INDEX.r_list[INDEX.r_list.length - 1]]);
+  K.oninput = R.oninput = load;
+  addEventListener("resize", () => CUR && render());
+  let lastWidth = 0;                                // a 0 -> N transition is the first real draw
+  new ResizeObserver(() => {
+    const w = $("attractor").clientWidth;
+    if (w !== lastWidth) { lastWidth = w; if (CUR) render(); }
+  }).observe($("app"));
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => CUR && render());
+  addEventListener("message", (e) => {            // the docs page passes its own palette down
+    const t = e.data && e.data.ks1dExplorerTheme;
+    if (t !== "dark" && t !== "light") return;
+    document.documentElement.dataset.theme = t;
+    if (CUR) render();
+  });
+  await load();
+  if (parent !== window) {
+    let posted = 0;
+    const post = () => {
+      const h = document.body.scrollHeight + 24;
+      if (Math.abs(h - posted) < 4) return;       // a 1px wobble must not feed itself back
+      posted = h;
+      parent.postMessage({ ks1dExplorerHeight: h }, "*");
+    };
+    post();
+    new ResizeObserver(post).observe(document.body);
+  }
+})();
+</script>
+</body>
+</html>
